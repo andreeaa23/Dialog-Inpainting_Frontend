@@ -20,6 +20,7 @@ const Container = styled.div`
   flex-direction: column;
   background-color: transparent;
   height: 100%;
+  width: 15%;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
   /* border: 1px solid white; */
@@ -54,15 +55,22 @@ const Input = styled.input`
   border: none;
   border-radius: 10px;
   width: 100%;
-  font-size: 18px;
+  font-size: 17px;
   color: white;
   background-color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
 
+  &::placeholder { /* This targets the placeholder text */
+  color: rgba(246, 246, 246, 0.8); /* Set the placeholder text color to semi-transparent white */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  
   &:focus {
     outline: none;
     background-color: rgba(255, 255, 255, 0.5);
   }
+
+
 `;
 
 const animateSearchBar = keyframes`
@@ -117,6 +125,28 @@ const DocumentContainer = styled.div`
   @media screen and (max-width: 800px) {
     width: 85%;
   }
+
+  /* Styling for WebKit-based browsers like Chrome and Safari */
+  &::-webkit-scrollbar {
+    width: 30px; /* Width of the scrollbar */
+    border-radius: 25px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f6f6f6; /* Color of the track */
+    border-radius: 10px; /* Border radius of the track */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #64CCC5; /* Color of the thumb */
+    border-radius: 25px; /* Border radius of the thumb */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the thumb on hover */
+  }
+
+
 `;
 
 const ContentContainer = styled.div`
@@ -140,6 +170,7 @@ const SidebarContainer = styled.div`
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  margin-top: 10%;
 
   @media screen and (max-width: 768px) {
     width: 100%;
@@ -155,7 +186,7 @@ const ToggleButtonContainer = styled.div`
   align-items: center;
   color: #e7ecef;
   font-weight: bold;
-  /* border-bottom: 0.5px solid white; */
+  margin-top: 5%;
 
   @media screen and (max-width: 880px) {
     width: 50%;
@@ -164,7 +195,7 @@ const ToggleButtonContainer = styled.div`
 `;
 
 const ToggleButton = styled.button`
-  width: 50%;
+  width: 20%;
   cursor: pointer;
   background-color: inherit;
   color: #e7ecef;
@@ -173,8 +204,9 @@ const ToggleButton = styled.button`
   border-radius: 5px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-left: 10px;
+  align-items: left;
+  margin-left: 5px;
+
 
   @media screen and (max-width: 880px) {
     width: 50%;
@@ -187,9 +219,8 @@ const Title = styled.h1`
   font-size: 20px;
   color: white;
   white-space: nowrap; 
-  margin-left: 5px;
-  padding: 3px 4px;
-  cursor: pointer; //cand se apasa aici trb sa se creze un nou chat: o noua cautare dupa titlu + golire content container
+  align-items: left;
+  cursor: pointer; 
 
   @media screen and (max-width: 768px) {
     font-size: 10px;
@@ -198,7 +229,7 @@ const Title = styled.h1`
 
 const DocumentTitle = styled.h1`
   text-align: left;
-  font-size: 15px;
+  font-size: 13px;
   color: white;
   white-space: nowrap; 
   padding: 3px 4px;
@@ -245,6 +276,12 @@ const StyledButton = styled.button`
 
 `;
 
+const ButtonContent = styled.div`
+  display: flex;
+  justify-content: space-between; /* Aligns children (title and icon) to start and end of the container */
+  align-items: center; /* Centers children vertically */
+  width: 100%; /* Takes full width to utilize justify-content properly */
+`;
 
 const Sidebar = () => {
     const [isOpen, setIsOpen] = useState(true);
@@ -254,6 +291,7 @@ const Sidebar = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isFetching, setIsFetching] = useState(false); 
     const [searchResults, setSearchResults] = useState([]);
+    const [titles, setTitles] = useState([]);
 
     const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -264,12 +302,6 @@ const Sidebar = () => {
     setSelectedTitle(title); //ce titlu de articol se selecteaza 
   };
 
-  const renderContent = () => {
-        //trb sa afisez acolo propozitiile selectate din articol
-        //trb facut aici un get
-        console.log("Sunt in content container");
-        return;
-    };
   
     useEffect(() => {
     const handleResize = () => {
@@ -307,6 +339,22 @@ const Sidebar = () => {
             setSearchResults(response.data);
             localStorage.setItem('lastSearchResults', JSON.stringify(response.data));
 
+          
+             const rsp = await axios.post('http://127.0.0.1:5000/addTitle', {
+              titles: [searchQuery.trim()] 
+          }, {
+              headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+              }
+          });
+
+          if (rsp.status === 200) {
+            // Update local state with new title
+            await fetchTitles();
+        }
+
+
             setSearchQuery('');
             console.log('Search results:', response.data);
         } else {
@@ -319,9 +367,36 @@ const Sidebar = () => {
     }
 };
 
+  const fetchTitles = async () => {
+    const token = localStorage.getItem('access_token');
+    try {
+        const response = await axios.get('http://127.0.0.1:5000/getTitles', {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        if (response.status === 200) {
+          const reversedTitles = response.data.titles.reverse();
+          setTitles(response.data.titles); // Update the state with the fetched titles
+                        //setTitles(prevTitles => [...prevTitles, searchQuery.trim()]);
+        } else {
+            console.error('Failed to fetch titles');
+        }
+    } catch (error) {
+        console.error('Error fetching titles:', error);
+    }
+  };
+
+  // Fetch titles when the component mounts
+    useEffect(() => {
+      fetchTitles();
+    }, []);
+
   return (
     <Container0>
-        <Container>
+        <Container isOpen={isOpen} style={isOpen ? { width: '15%' } : { width: '2%'}}>
+          
         <ToggleButtonContainer>
           <ToggleButton onClick={toggleSidebar} isOpen={isOpen}>
             {isOpen ? <ChatIcon /> : <ChatIcon style={{ fontSize: 20 }} />}
@@ -330,34 +405,29 @@ const Sidebar = () => {
         </ToggleButtonContainer>
 
             <SidebarContainer>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-            <li>
-              <StyledButton
-                isOpen={isOpen}
-                style={isOpen ? { width: '100%' } : { width: '100%'}}
-                onClick={() => handleDocumentClick('TITLU1')} //aici trb pus ce acceseaza gen
-              >
-                <DocumentTitle>First Title Here</DocumentTitle>
-                {isOpen ? (<DeleteIcon style={{ marginRight: '5px' }} />) : (null)}
-              </StyledButton>
-            </li>
-            <li>
-              <StyledButton
-                isOpen={isOpen}
-                style={isOpen ? { width: '100%' } : { width: '100%'}}
-                onClick={() => handleDocumentClick('TITLU2')} //aici trb pus ce acceseaza gen
-              >
-                <DocumentTitle>Second Title Here</DocumentTitle>
-                {isOpen ? (<DeleteIcon style={{ marginRight: '5px' }} />) : (null)}
-              </StyledButton>
-            </li>
-            </ul>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {titles.map((title, index) => (
+                  <li key={index}>
+                    <StyledButton
+                      isOpen={isOpen}
+                      style={isOpen ? { width: '100%' } : { width: '0%'}}
+                      onClick={() => handleDocumentClick(title)}
+                    >
+                      {isOpen &&
+                      <ButtonContent>
+                        <DocumentTitle>{title}</DocumentTitle>
+                          <DeleteIcon style={{ marginRight: '5px' }} />
+                      </ButtonContent>
+                      }
+                    </StyledButton>
+                  </li>
+                ))}
+                </ul>
             </SidebarContainer>
         </Container>
 
         <ChatContainer>
           <SearchContainer>
-            {/* <SearchIcon /> */}
             <Input placeholder="Introduce a title..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -368,13 +438,12 @@ const Sidebar = () => {
           </SearchContainer>
 
           <DocumentContainer>
-          {searchResults.map((result, index) => (
-    <div key={index}>
-      <p>{result}</p>
-    </div>
-  ))}
+            {searchResults.map((result, index) => (
+              <div key={index} style={{ paddingLeft: '20px' }}>
+                <p>{result}</p>
+              </div>
+            ))}
           </DocumentContainer>
-          {/* <ContentContainer>{renderContent()}</ContentContainer> */}
           <ContentContainer>DIALOG HERE</ContentContainer>
         </ChatContainer>
     </Container0>

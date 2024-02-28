@@ -46,22 +46,23 @@ const Left = styled.div`
 
 const Right = styled.div`
   display: flex;
-  align-items: right;
-  /* justify-content: flex-end; */
-  margin-left: 800px;
+  align-items: center; // Corrected from 'right' to 'center' for proper CSS value
+  justify-content: flex-end;
+  margin-left: 780px;
   color: #e7ecef;
   font-size: 17px;
-  margin-right: 10;
   font-weight: bold;
   cursor: pointer;
 
-  @media screen and (max-width: 880px) {
-    margin-left: 80px;
+  @media screen and (min-width: 856px) {
+    margin-left: 780px;
   }
 
-  @media screen and (min-width: 880px) {
-    margin-left: 730px;
+  @media screen and (max-width: 905px) {
+    margin-left: 700px;
   }
+
+
 
 `;
 
@@ -75,13 +76,16 @@ const LogOutButton = styled.div`
   transition: all 0.3s ease-in-out;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  font-weight: bold;
   border: 0.1px solid #9BBEC8;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
  
 
   &:hover {
     transform: translateY(-2px);
-    background-color: #d32f2f;
+    background-color: #64CCC5;
+    border: 2px solid #64CCC5;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     font-weight: bold;
@@ -90,73 +94,12 @@ const LogOutButton = styled.div`
 `;
 
 const LogOutIcon = styled(LogoutIcon)`
-  margin-right: 10px;
-`;
-
-const InputContainer = styled.div`
-  position: relative;
-  z-index: 20;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  width: 300px;
-  font-size: 18px;
-  color: white;
-  background-color: rgba(255, 255, 255, 0.2);
-
-  &:focus {
-    outline: none;
-    background-color: rgba(255, 255, 255, 0.5);
-  }
-`;
-
-const SearchIconContainer = styled(SearchIcon)`
-  position: absolute;
-  top: 50%;
-  left: -25px;
-  transform: translateY(-50%);
-  color: #fff;
-`;
-
-const animateSearchBar = keyframes`
-  0% {
-    width: 300px;
-  }
-  100% {
-    width: 500px;
-  }
-`;
-
-const AnimatedInput = styled(Input)`
-  animation: ${animateSearchBar} 0.3s forwards;
-  transition: width 0.3s ease-in-out;
-`;
-
-const SearchButton = styled.div`
-  //position: fixed;
-  background-color: #427D9D;
-  color: 7439db;
-  padding: 7px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  font-weight: bold;
   margin-left: 10px;
-  border: 0.1px solid #9BBEC8;
 
-  &:hover {
-    transform: translateY(-2px);
-    background-color: #64CCC5;
-    border: 0.1px solid #DAFFFB;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    font-weight: bold;
-  }
+`;
+
+const LogOutText = styled.span`
+  font-size: 17px;
 
 `;
 
@@ -164,9 +107,6 @@ const SearchButton = styled.div`
 const Navbar = () => {
 
     const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isFetching, setIsFetching] = useState(false); 
-    const [searchResults, setSearchResults] = useState([]);
 
     const handleLogout = async () => 
     {
@@ -187,61 +127,14 @@ const Navbar = () => {
         navigate('/login');
   }
 
-  const handleSearch = async (e) => {
-    if (!searchQuery) {
-        toast.error("Please fill the search field!");
-        return;
-    }
-    e.preventDefault();
-    setIsFetching(true);
-
-    console.log(searchQuery);
-    try {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://127.0.0.1:5000/getContent', {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            params: { page_title: searchQuery.trim() }
-        });
-
-        if (response.status === 200) {
-            setSearchResults(response.data);
-            localStorage.setItem('lastSearchResults', JSON.stringify(response.data));
-
-            setSearchQuery('');
-            console.log('Search results:', response.data);
-        } else {
-            console.error('Failed to fetch search results');
-        }
-    } catch (error) {
-        console.error('Error fetching search results:', error);
-    } finally {
-        setIsFetching(false);
-    }
-};
 
     return (
         <Container>
           <Wrapper>
-            {/* <Left> */}
-
-                {/* <SearchIcon />
-                <Input placeholder="Search a title..."
-                       value={searchQuery}
-                       onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <SearchButton onClick={handleSearch} disabled={isFetching}>
-                    {isFetching ? 'Searching...' : 'Search'}
-                </SearchButton> */}
-                
-            {/* </Left> */}
-
             <Right>
             <LogOutButton onClick={handleLogout}>
-                <LogOutIcon icon={LogoutIcon}/>
-                    Log Out
+              <LogOutText> Log Out </LogOutText> 
+                    <LogOutIcon icon={LogoutIcon}/>
                 </LogOutButton>      
             </Right>
           </Wrapper>

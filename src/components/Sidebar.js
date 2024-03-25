@@ -278,32 +278,34 @@ const StyledButton = styled.button`
 
 const ButtonContent = styled.div`
   display: flex;
-  justify-content: space-between; /* Aligns children (title and icon) to start and end of the container */
-  align-items: center; /* Centers children vertically */
-  width: 100%; /* Takes full width to utilize justify-content properly */
+  justify-content: space-between; 
+  align-items: center; 
+  width: 100%; 
 `;
 
-const Sidebar = () => {
-    const [isOpen, setIsOpen] = useState(true);
-    const [selectedTitle, setSelectedTitle] = useState('');
-    const [title, setTitle] = useState('');
-    const navigate = useNavigate();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isFetching, setIsFetching] = useState(false); 
-    const [searchResults, setSearchResults] = useState([]);
-    const [titles, setTitles] = useState([]);
 
-    const toggleSidebar = () => {
+const Sidebar = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [selectedTitle, setSelectedTitle] = useState('');
+  const [title, setTitle] = useState('');
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isFetching, setIsFetching] = useState(false); 
+  const [searchResults, setSearchResults] = useState([]);
+  const [titles, setTitles] = useState([]);
+  const [selectedSummary, setSelectedSummary] = useState('');
+  const [triggerFetch, setTriggerFetch] = useState(false);
+
+  const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
 
- 
-  const handleDocumentClick = title => {
-    setSelectedTitle(title); //ce titlu de articol se selecteaza 
+  const handleDocumentClick = (title, summary) => {
+    setSelectedTitle(title);
+    setSelectedSummary(summary); 
   };
 
-  
-    useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsOpen(window.innerWidth > 768);
     };
@@ -315,58 +317,6 @@ const Sidebar = () => {
     };
   }, []);
 
-  const handleSearch = async (e) => {
-    if (!searchQuery) {
-        toast.error("Please fill the search field!");
-        return;
-    }
-    e.preventDefault();
-    setIsFetching(true);
-
-    console.log(searchQuery);
-    setTitle(title);
-    try {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://127.0.0.1:5000/getContent', {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            params: { page_title: searchQuery.trim() }
-        });
-
-        if (response.status === 200) {
-            setSearchResults(response.data);
-            localStorage.setItem('lastSearchResults', JSON.stringify(response.data));
-
-          
-             const rsp = await axios.post('http://127.0.0.1:5000/addTitle', {
-              titles: [searchQuery.trim()] 
-          }, {
-              headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: `Bearer ${token}`,
-              }
-          });
-
-          if (rsp.status === 200) {
-            // Update local state with new title
-            await fetchTitles();
-        }
-
-
-            setSearchQuery('');
-            console.log('Search results:', response.data);
-        } else {
-            console.error('Failed to fetch search results');
-        }
-    } catch (error) {
-        console.error('Error fetching search results:', error);
-    } finally {
-        setIsFetching(false);
-    }
-};
-
   const fetchTitles = async () => {
     const token = localStorage.getItem('access_token');
     try {
@@ -377,22 +327,116 @@ const Sidebar = () => {
             }
         });
         if (response.status === 200) {
-          const reversedTitles = response.data.titles.reverse();
-          setTitles(response.data.titles); // Update the state with the fetched titles
-                        //setTitles(prevTitles => [...prevTitles, searchQuery.trim()]);
+          const titlesData = response.data.searched_titles || [];
+          setTitles(titlesData.reverse());
+
         } else {
             console.error('Failed to fetch titles');
+            setTitles([]); 
         }
     } catch (error) {
         console.error('Error fetching titles:', error);
+        setTitles([]); 
     }
   };
 
-  // Fetch titles when the component mounts
-    useEffect(() => {
+  useEffect(() => {
       fetchTitles();
-    }, []);
+      setTriggerFetch(false);
+    }, [triggerFetch]);
 
+  const handleSearch = async (e) => {
+    if (!searchQuery) {
+        toast.error("Please fill the search field!");
+        return;
+    }
+    e.preventDefault();
+    setIsFetching(true);
+    setSearchResults([]); 
+
+    console.log(searchQuery);
+    setTitle(title);
+
+    try 
+    {
+        const token = localStorage.getItem('access_token');
+        const summaryResponse = await axios.get('http://127.0.0.1:5000/getSummary', {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            params: { page_title: searchQuery.trim() }
+        });
+
+        if (summaryResponse.status === 200) {
+            const results = Array.isArray(summaryResponse.data) 
+                ? summaryResponse.data 
+                : summaryResponse.data.split('\n');
+    
+            setSearchResults(results);
+            setSelectedSummary(results.join('\n'));
+            localStorage.setItem('lastSearchResults', JSON.stringify(results));
+            console.log('Search results:', results);
+            setTriggerFetch(true);
+        } 
+        else 
+        {
+            toast.error('The page doesn\'t exist on English Wikipedia!');
+        }
+    } 
+    catch (error) 
+    {
+        if (error.response && error.response.status === 404)
+        {
+            toast.error(error.response.data.message);
+
+        }
+        else 
+        {
+            //console.error('Error fetching search results:', error);
+            //toast.error('An error occurred while fetching search results.');
+            //toast.error('The page doesn\'t exist on English Wikipedia!');
+            setTriggerFetch(true);
+        }
+    } 
+    finally 
+    {
+        setIsFetching(false);
+        setSearchQuery(''); 
+    }
+  };
+
+  const handleDeleteClick = (e, titleToDelete) => {
+    e.stopPropagation(); 
+  
+    if (!window.confirm(`Are you sure you want to delete "${titleToDelete}"?`)) {
+      return; 
+    }
+  
+    const token = localStorage.getItem('access_token');
+    axios.post('http://127.0.0.1:5000/deleteTitle', { title: titleToDelete }, {
+      headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+      }
+    })
+    .then(response => {
+        if (response.status === 200) {
+            // fetchTitles(); 
+            setTriggerFetch(true);
+            setSelectedSummary('');
+            toast.success('Title deleted successfully!');
+        } else {
+            console.error('Failed to delete the title');
+            toast.error('Failed to delete the title');
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting the title:', error);
+        toast.error('An error occurred while deleting the title');
+    });
+  };
+  
   return (
     <Container0>
         <Container isOpen={isOpen} style={isOpen ? { width: '15%' } : { width: '2%'}}>
@@ -404,26 +448,28 @@ const Sidebar = () => {
           <Title isOpen={isOpen}>{isOpen ? 'New Dialog' : null}</Title>
         </ToggleButtonContainer>
 
-            <SidebarContainer>
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {titles.map((title, index) => (
-                  <li key={index}>
-                    <StyledButton
-                      isOpen={isOpen}
-                      style={isOpen ? { width: '100%' } : { width: '0%'}}
-                      onClick={() => handleDocumentClick(title)}
-                    >
-                      {isOpen &&
+        <SidebarContainer style={isOpen ? { width: '100%' } : { display: 'none'}}>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {titles.map((item, index) => (
+                <li key={index}>
+                  <StyledButton
+                    isOpen={isOpen}
+                    onClick={() => handleDocumentClick(item.title, item.summary)} 
+                    style={isOpen ? { width: '195px' } : { width: '0%'}}
+                  >
+                    {isOpen && (
                       <ButtonContent>
-                        <DocumentTitle>{title}</DocumentTitle>
+                        <DocumentTitle>{item.title}</DocumentTitle>
+                        <div onClick={(e) => handleDeleteClick(e, item.title)}>
                           <DeleteIcon style={{ marginRight: '5px' }} />
+                        </div>
                       </ButtonContent>
-                      }
-                    </StyledButton>
-                  </li>
-                ))}
-                </ul>
-            </SidebarContainer>
+                    )}
+                  </StyledButton>
+                </li>
+              ))}
+          </ul>
+      </SidebarContainer>
         </Container>
 
         <ChatContainer>
@@ -438,16 +484,30 @@ const Sidebar = () => {
           </SearchContainer>
 
           <DocumentContainer>
-            {searchResults.map((result, index) => (
-              <div key={index} style={{ paddingLeft: '20px' }}>
-                <p>{result}</p>
-              </div>
+            {selectedSummary.split('\n').map((part, index) => (
+              <React.Fragment key={index}>
+                <p key={index} style={{ textIndent: '2em', marginLeft: "3px" }}>{part}</p> 
+              </React.Fragment>
             ))}
           </DocumentContainer>
+
           <ContentContainer>DIALOG HERE</ContentContainer>
         </ChatContainer>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
+
     </Container0>
-  )
+  );
 }
 
-export default Sidebar
+export default Sidebar;

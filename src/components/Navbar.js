@@ -124,7 +124,11 @@ const Navbar = () => {
             theme: 'colored',
         });
 
-        navigate('/login');
+       // navigate('/login');
+       // Wait for the toast to show before refreshing
+    setTimeout(() => {
+      window.location.href = '/login'; // Or use window.location.reload() for a hard refresh
+    }, 1000); // Adjust time as needed for the toast to be visible
   }
 
 

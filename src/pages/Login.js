@@ -174,6 +174,7 @@ const Login = () => {
       })
 
       localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('username', username);
       console.log(response.data);
 
       //redirect to dashboard if successful login

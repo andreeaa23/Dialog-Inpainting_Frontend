@@ -8,7 +8,8 @@ import ChangePassword from './pages/ChangePassword.js';
 import SearchDocument from './pages/SearchDocument.js';
 
 const checkIfLoggedIn = () => {
-  const token = localStorage.getItem('access_token'); // Assuming you store the JWT token in localStorage
+  
+  const token = localStorage.getItem('access_token'); 
 
   if (!token) 
     return false;
@@ -16,7 +17,7 @@ const checkIfLoggedIn = () => {
   try 
   {
     const decodedToken = jwtDecode(token);
-    const currentTime = Date.now() / 1000; // Convert current time to seconds
+    const currentTime = Date.now() / 1000; 
 
     return decodedToken.exp > currentTime;
   }
@@ -34,12 +35,6 @@ const App = () => {
   return (
     <BrowserRouter>
     <Routes>
-      {/* <Route path='/' element={isLoggedIn ? <Dashboard/> : <Navigate to='/login' />} />
-      <Route path='/dashboard' element={!isLoggedIn ?  <Navigate to='/login' /> : <Dashboard/>} />
-      <Route path='/login' element={!isLoggedIn ?  <Login/> : <Navigate to='/dashboard' />} />
-      <Route path='/register' element={!isLoggedIn ? <Register/> : <Navigate to='/dashboard' />} />
-      <Route path='/change-password' element={isLoggedIn ? <ChangePassword/> : <Navigate to='/login' />} />
-      <Route path='/search-document' element={isLoggedIn ? <SearchDocument/> : <Navigate to='/login' />} />  e de fapt getContent */}
       {isLoggedIn ? (
           <>
             <Route path="/" element = { <Navigate to="/dashboard" /> } />

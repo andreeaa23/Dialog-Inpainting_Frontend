@@ -8,6 +8,15 @@ import axios from 'axios';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import SendIcon from '@mui/icons-material/Send';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import AI_Icon from '../images/ai.webp'
+import AI_Icon2 from '../images/ai2.png'
+import UserIcon from '../images/user.png'
+import "react-chat-elements/dist/main.css"
+import { MessageBox } from "react-chat-elements";
+import { MessageList } from "react-chat-elements"
+import index from '../index.css'
 
 const Container0 = styled.div`
   display: flex;
@@ -38,7 +47,6 @@ const SearchContainer = styled.div`
   width:30%;
   height: 100%;
 `
-
 const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -48,6 +56,7 @@ const ChatContainer = styled.div`
   margin-right: 1%;
   margin-left:1%;
   /* background-color: pink; */
+  
 
 `
 const Input = styled.input`
@@ -67,7 +76,7 @@ const Input = styled.input`
   
   &:focus {
     outline: none;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.4);
   }
 
 
@@ -80,11 +89,6 @@ const animateSearchBar = keyframes`
   100% {
     width: 500px;
   }
-`;
-
-const AnimatedInput = styled(Input)`
-  animation: ${animateSearchBar} 0.3s forwards;
-  transition: width 0.3s ease-in-out;
 `;
 
 const SearchButton = styled.div`
@@ -120,30 +124,29 @@ const DocumentContainer = styled.div`
   height: 200px;
   margin-bottom: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
-  overflow-y: auto; /* Make the container scrollable */
+  overflow-y: auto; 
 
   @media screen and (max-width: 800px) {
     width: 85%;
   }
 
-  /* Styling for WebKit-based browsers like Chrome and Safari */
   &::-webkit-scrollbar {
-    width: 30px; /* Width of the scrollbar */
+    width: 30px; 
     border-radius: 25px;
   }
 
   &::-webkit-scrollbar-track {
-    background: #f6f6f6; /* Color of the track */
-    border-radius: 10px; /* Border radius of the track */
+    background: #f6f6f6; 
+    border-radius: 10px; 
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #64CCC5; /* Color of the thumb */
-    border-radius: 25px; /* Border radius of the thumb */
+    background: #427D9D; 
+    border-radius: 25px; 
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Color of the thumb on hover */
+    background: #555; 
   }
 
 
@@ -153,12 +156,147 @@ const ContentContainer = styled.div`
   background-color: white;
   width: 100%;
   border-radius: 25px;
-  height: 400px;
-  margin-bottom: 30px;
+  height: 350px;
+  margin-bottom: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow-y: auto; 
+  overflow-x: hidden;
 
   @media screen and (max-width: 800px) {
     width: 85%;
+  }
+
+  &::-webkit-scrollbar {
+    width: 30px; 
+    border-radius: 25px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f6f6f6; 
+    border-radius: 10px; 
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #427D9D; 
+    border-radius: 25px; 
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+`;
+
+const FixedSearchContainer = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -2px 4px rgba(0,0,0,0.1); 
+  border-radius: 10px;
+  
+`;
+
+// const InputChat = styled.input`
+//   padding: 10px;
+//   border: none;
+//   border-radius: 10px;
+//   width: 100%;
+//   font-size: 15px;
+//   color: white;
+//   background-color: rgba(255, 255, 255, 0.2);
+//   cursor: pointer;
+
+//   &::placeholder { 
+//   color: rgba(246, 246, 246, 0.8); 
+//     text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+//   }
+  
+//   &:focus {
+//     outline: none;
+//     background-color: rgba(255, 255, 255, 0.3);
+//   }
+
+
+// `;
+
+// const SearchIconContainer = styled.div`
+//   display: flex; 
+//   justify-content: center; 
+//   align-items: center; 
+//   background-color: #427D9D;
+//   color: white;
+//   padding: 7px 10px;
+//   border-radius: 5px;
+//   cursor: pointer;
+//   transition: all 0.3s ease-in-out;
+//   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+//   font-weight: bold;
+//   margin-left: 10px;
+//   border: 0.1px solid #9BBEC8;
+  
+//   &:hover {
+//     transform: translateY(-2px);
+//     background-color: #64CCC5;
+//     border: 0.1px solid #DAFFFB;
+//     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+//     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+//     font-weight: bold;
+//   }
+// `;
+
+const SearchIconContainer = styled.div`
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: white;
+  transition: transform 0.3s ease;
+  border: 1px solid white; 
+  border-radius: 10px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+
+
+  &:hover {
+    transform: translateY(-50%) scale(1.3);
+  }
+`;
+
+const InputChatContainer = styled.div`
+  position: relative; 
+  flex-grow: 1; 
+  margin-right: 10px; 
+  overflow: hidden;
+  border-radius: 10px;
+
+
+`;
+
+const InputChat = styled.input`
+  padding: 10px;
+  padding-right: 50px;
+  border: none;
+  border-radius: 10px;
+  width: 100%; // Full width of its container
+  font-size: 15px;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+  cursor: text; // Use text cursor instead of pointer
+
+  &::placeholder { 
+    color: rgba(246, 246, 246, 0.8); 
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    
+  }
+  
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.3);
   }
 `;
 
@@ -171,6 +309,7 @@ const SidebarContainer = styled.div`
   flex-direction: row;
   overflow: hidden;
   margin-top: 10%;
+  overflow-y: auto; 
 
   @media screen and (max-width: 768px) {
     width: 100%;
@@ -283,6 +422,48 @@ const ButtonContent = styled.div`
   width: 100%; 
 `;
 
+const AiContainer = styled.div`
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px; 
+  margin-top: 10px; 
+`;
+
+const AiIconContainer = styled.div`
+  /* position: absolute;  */
+
+  width: 40px; 
+  height: 50px; 
+
+  img {
+    width: 100%; 
+    height: 35px; 
+  }
+`;
+
+const UserContainer = styled.div`
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: row;
+  position: right;
+  margin-top: 20px; 
+  justify-content: flex-end;
+`;
+
+const UserIconContainer = styled.div`
+  /* position: absolute;  */
+  width: 40px; 
+  height: 40px; 
+
+  img {
+    width: 100%; 
+    height: 35px; 
+  }
+`;
+
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -295,6 +476,9 @@ const Sidebar = () => {
   const [titles, setTitles] = useState([]);
   const [selectedSummary, setSelectedSummary] = useState('');
   const [triggerFetch, setTriggerFetch] = useState(false);
+  const [userInput, setUserInput] = useState('');
+  const [messages, setMessages] = useState([]);
+  const username = localStorage.getItem('username');
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -436,7 +620,30 @@ const Sidebar = () => {
         toast.error('An error occurred while deleting the title');
     });
   };
+
+
+  const handleInputChange = (e) => {
+    setUserInput(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    if (userInput.trim()) {
+      setMessages([...messages, userInput]);
+      setUserInput(''); 
+    }
+  };
+
+  const clearDialog = () => {
+    setSelectedSummary(''); 
+    setMessages([]); 
+  };
   
+  const handleNewDialogClick = () => {
+    if (isOpen) {
+      clearDialog(); // Only clear when the sidebar is open and going to be closed
+    }
+  };
+
   return (
     <Container0>
         <Container isOpen={isOpen} style={isOpen ? { width: '15%' } : { width: '2%'}}>
@@ -445,7 +652,7 @@ const Sidebar = () => {
           <ToggleButton onClick={toggleSidebar} isOpen={isOpen}>
             {isOpen ? <ChatIcon /> : <ChatIcon style={{ fontSize: 20 }} />}
           </ToggleButton>
-          <Title isOpen={isOpen}>{isOpen ? 'New Dialog' : null}</Title>
+          <Title onClick={handleNewDialogClick} isOpen={isOpen}>{isOpen ? 'New Dialog' : null}</Title>
         </ToggleButtonContainer>
 
         <SidebarContainer style={isOpen ? { width: '100%' } : { display: 'none'}}>
@@ -491,7 +698,49 @@ const Sidebar = () => {
             ))}
           </DocumentContainer>
 
-          <ContentContainer>DIALOG HERE</ContentContainer>
+          <ContentContainer>
+            <AiContainer>
+              <AiIconContainer>
+                <img src={AI_Icon2} alt="AI Icon" />
+              </AiIconContainer>
+
+              <MessageBox
+              position='left'
+              title='AI'
+              type='text'
+              text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi, I'm your automated assistant. I can answer your questions.`}
+              />              
+            </AiContainer>
+
+            {messages.map((message, index) => (
+              <UserContainer key={index}>
+                <MessageBox
+                  position="right"
+                  title={username}
+                  type="text"
+                  text={message}
+                />
+                <UserIconContainer>
+                  <img src={UserIcon} alt="User Icon" />
+                </UserIconContainer>
+              </UserContainer>
+            ))}
+
+          </ContentContainer>
+
+          <FixedSearchContainer>
+            <InputChatContainer>
+              <InputChat 
+                placeholder="Ask a question..."
+                value={userInput}
+                onChange={handleInputChange}
+              />
+              <SearchIconContainer onClick={handleSendMessage}>
+                <ArrowUpwardIcon/>
+              </SearchIconContainer>
+            </InputChatContainer>
+          </FixedSearchContainer>
+
         </ChatContainer>
         <ToastContainer
           position="top-right"

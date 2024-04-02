@@ -111,6 +111,7 @@ const Navbar = () => {
     const handleLogout = async () => 
     {
         localStorage.removeItem('access_token');
+        localStorage.removeItem('username');
         localStorage.removeItem('lastSearchResults')
 
         toast.success('Successful Log Out!', {

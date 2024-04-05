@@ -512,7 +512,8 @@ const Sidebar = () => {
         });
         if (response.status === 200) {
           const titlesData = response.data.searched_titles || [];
-          setTitles(titlesData.reverse());
+          // setTitles(titlesData.reverse());
+          setTitles(titlesData);
 
         } else {
             console.error('Failed to fetch titles');
@@ -559,7 +560,7 @@ const Sidebar = () => {
     
             setSearchResults(results);
             setSelectedSummary(results.join('\n'));
-            localStorage.setItem('lastSearchResults', JSON.stringify(results));
+           // localStorage.setItem('lastSearchResults', JSON.stringify(results));
             console.log('Search results:', results);
             setTriggerFetch(true);
         } 

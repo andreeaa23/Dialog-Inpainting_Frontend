@@ -478,7 +478,9 @@ const Sidebar = () => {
   const [triggerFetch, setTriggerFetch] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [messages, setMessages] = useState([]);
+  const [AImessages, setAIMessages] = useState([]);
   const username = localStorage.getItem('username');
+  const [conversation, setConversation] = useState([]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -487,6 +489,8 @@ const Sidebar = () => {
   const handleDocumentClick = (title, summary) => {
     setSelectedTitle(title);
     setSelectedSummary(summary); 
+    setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
+    setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
   };
 
   useEffect(() => {
@@ -627,12 +631,6 @@ const Sidebar = () => {
     setUserInput(e.target.value);
   };
 
-  const handleSendMessage = () => {
-    if (userInput.trim()) {
-      setMessages([...messages, userInput]);
-      setUserInput(''); 
-    }
-  };
 
   const clearDialog = () => {
     setSelectedSummary(''); 
@@ -645,6 +643,60 @@ const Sidebar = () => {
     }
   };
 
+  const handleQuestionSubmit = async () => {
+    if (userInput.trim()) {
+      setMessages([...messages, userInput]);
+      setUserInput(''); 
+    }
+
+    if (!selectedTitle || !userInput) {
+      toast.error("Both title and question are required!");
+      return;
+    }
+
+    setConversation(prev => [...prev, { type: 'User', text: userInput }]);
+
+  
+    setIsFetching(true); 
+  
+    const token = localStorage.getItem('access_token');
+    try {
+      const response = await axios.post('http://127.0.0.1:5000/getAnswer', {
+        title: selectedTitle,
+        question: userInput
+       
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      console.log(userInput);
+  
+      if (response.status === 200) {
+        const answer = response.data;
+        setConversation(prev => [...prev, { type: 'AI', text: `${answer}` }]);
+        console.log(answer);
+        setAIMessages([...AImessages, answer]);
+        toast.success('Answer fetched successfully!');
+      } 
+      else 
+      {
+        toast.error('Failed to fetch answer');
+      }
+    }
+    catch (error) 
+    {
+      console.error('Error fetching answer:', error);
+      toast.error('An error occurred while fetching the answer');
+    } 
+    finally 
+    {
+      setIsFetching(false);
+      setUserInput('');
+    }
+  };
+  
   return (
     <Container0>
         <Container isOpen={isOpen} style={isOpen ? { width: '15%' } : { width: '2%'}}>
@@ -700,33 +752,38 @@ const Sidebar = () => {
           </DocumentContainer>
 
           <ContentContainer>
-            <AiContainer>
-              <AiIconContainer>
-                <img src={AI_Icon2} alt="AI Icon" />
-              </AiIconContainer>
-
-              <MessageBox
-              position='left'
-              title='AI'
-              type='text'
-              text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi, I'm your automated assistant. I can answer your questions.`}
-              />              
-            </AiContainer>
-
-            {messages.map((message, index) => (
-              <UserContainer key={index}>
-                <MessageBox
-                  position="right"
-                  title={username}
-                  type="text"
-                  text={message}
-                />
-                <UserIconContainer>
-                  <img src={UserIcon} alt="User Icon" />
-                </UserIconContainer>
-              </UserContainer>
-            ))}
-
+          {conversation.map((message, index) => {
+              if (message.type === 'AI') {
+                return (
+                  <AiContainer key={index}>
+                    <AiIconContainer>
+                      <img src={AI_Icon2} alt="AI Icon" />
+                    </AiIconContainer>
+                    <MessageBox
+                      position='left'
+                      title='AI'
+                      type='text'
+                      text={message.text}
+                    />
+                  </AiContainer>
+                );
+              } 
+              else {
+                return (
+                  <UserContainer key={index}>
+                    <MessageBox
+                      position="right"
+                      title={username}
+                      type="text"
+                      text={message.text}
+                    />
+                    <UserIconContainer>
+                      <img src={UserIcon} alt="User Icon" />
+                    </UserIconContainer>
+                  </UserContainer>
+                );
+              }
+            })}
           </ContentContainer>
 
           <FixedSearchContainer>
@@ -736,7 +793,7 @@ const Sidebar = () => {
                 value={userInput}
                 onChange={handleInputChange}
               />
-              <SearchIconContainer onClick={handleSendMessage}>
+              <SearchIconContainer onClick={handleQuestionSubmit}>
                 <ArrowUpwardIcon/>
               </SearchIconContainer>
             </InputChatContainer>

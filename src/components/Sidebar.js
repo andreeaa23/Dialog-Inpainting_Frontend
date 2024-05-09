@@ -8,7 +8,6 @@ import axios from 'axios';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import SendIcon from '@mui/icons-material/Send';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import AI_Icon from '../images/ai.webp'
 import AI_Icon2 from '../images/ai2.png'
@@ -16,7 +15,7 @@ import UserIcon from '../images/user.png'
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { MessageList } from "react-chat-elements"
-import index from '../index.css'
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 
 const Container0 = styled.div`
   display: flex;
@@ -104,6 +103,9 @@ const SearchButton = styled.div`
   font-weight: bold;
   margin-left: 10px;
   border: 0.1px solid #9BBEC8;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 
   &:hover {
     transform: translateY(-2px);
@@ -486,11 +488,33 @@ const Sidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleDocumentClick = (title, summary) => {
+  const handleDocumentClick = async (title, summary) => {
     setSelectedTitle(title);
     setSelectedSummary(summary); 
     setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
-    setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
+    //setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await axios.get('http://127.0.0.1:5000/getConversation', {
+          headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+          },
+          params: { title }
+      });
+
+      if (response.status === 200 && response.data?.conversation?.length > 0) {
+          setConversation(response.data.conversation);
+          console.log('Conversation:', response.data.conversation);
+      } else {
+          // No conversation found or an empty list returned
+          setConversation([{ type: 'AI', text: `No existing conversation found for "${title}". Start a new conversation below:` }]);
+      }
+  } catch (error) {
+      console.error('Error fetching conversation:', error);
+     // setConversation([{ type: 'AI', text: `Failed to load conversation for "${title}". You may start a new conversation.` }]);
+     setConversation([]);
+  }
   };
 
   useEffect(() => {
@@ -516,7 +540,7 @@ const Sidebar = () => {
         });
         if (response.status === 200) {
           const titlesData = response.data.searched_titles || [];
-          // setTitles(titlesData.reverse());
+          //setTitles(titlesData.reverse());
           setTitles(titlesData);
 
         } else {
@@ -696,6 +720,46 @@ const Sidebar = () => {
       setUserInput('');
     }
   };
+
+  const handleSaveConversation = async () => {
+    if (!selectedTitle || conversation.length === 0) {
+        toast.error("No conversation to save or no title selected!");
+        return;
+    }
+
+    setIsFetching(true);  // Show a loading indicator if you have one
+
+    const token = localStorage.getItem('access_token');
+    try
+    {
+        console.log(conversation);
+        const response = await axios.post('http://127.0.0.1:5000/saveConversation', {
+            title: selectedTitle,
+            conversation: conversation
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            }
+        });
+
+        if (response.status === 200) 
+            toast.success('Conversation saved successfully!');
+        else 
+            toast.error('Failed to save conversation');
+        
+    } 
+    catch (error) 
+    {
+        console.error('Error saving conversation:', error);
+        toast.error('An error occurred while saving the conversation');
+    } 
+    finally 
+    {
+        setIsFetching(false);  // Hide loading indicator
+    }
+};
+
   
   return (
     <Container0>
@@ -740,6 +804,12 @@ const Sidebar = () => {
             />
             <SearchButton onClick={handleSearch} disabled={isFetching}>
                 {isFetching ? 'Searching...' : 'Search'}
+                <SearchIcon style={{marginLeft:"5px"}}/>
+            </SearchButton>
+
+            <SearchButton onClick={handleSaveConversation} disabled={isFetching}>
+                {isFetching ? 'Saving...' : 'Save'}
+                <SaveAltIcon style={{marginLeft:"5px"}}/>
             </SearchButton>
           </SearchContainer>
 
@@ -752,7 +822,7 @@ const Sidebar = () => {
           </DocumentContainer>
 
           <ContentContainer>
-          {conversation.map((message, index) => {
+          {/* {conversation.map((message, index) => {
               if (message.type === 'AI') {
                 return (
                   <AiContainer key={index}>
@@ -783,7 +853,39 @@ const Sidebar = () => {
                   </UserContainer>
                 );
               }
-            })}
+            })} */}
+            {conversation && conversation.length > 0 ? (
+        conversation.map((message, index) => (
+            message.type === 'AI' ? (
+                <AiContainer key={index}>
+                    <AiIconContainer>
+                        <img src={AI_Icon2} alt="AI Icon" />
+                    </AiIconContainer>
+                    <MessageBox position='left' title='AI' type='text' text={message.text} />
+                </AiContainer>
+            ) : (
+                <UserContainer key={index}>
+                    <MessageBox position="right" title={username} type="text" text={message.text} />
+                    <UserIconContainer>
+                        <img src={UserIcon} alt="User Icon" />
+                    </UserIconContainer>
+                </UserContainer>
+            )
+        ))
+    ) : (
+
+        <AiContainer >
+                    <AiIconContainer>
+                      <img src={AI_Icon2} alt="AI Icon" />
+                    </AiIconContainer>
+                    <MessageBox
+                      position='left'
+                      title='AI'
+                      type='text'
+                      text="Hi! Start a new conversation by searching for a Wikipedia document title!"
+                    />
+                  </AiContainer>
+    )}
           </ContentContainer>
 
           <FixedSearchContainer>

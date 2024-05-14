@@ -6,6 +6,7 @@ import  Register from "./pages/Register";
 import  Dashboard  from "./pages/Dashboard";
 import ChangePassword from './pages/ChangePassword.js';
 import SearchDocument from './pages/SearchDocument.js';
+import ForgotPassword from './pages/ForgotPassword.js';
 
 const checkIfLoggedIn = () => {
   
@@ -40,7 +41,7 @@ const App = () => {
             <Route path="/" element = { <Navigate to="/dashboard" /> } />
             <Route path="/login" element={<Navigate to={'/dashboard'} />} />
             <Route path="/register" element={<Navigate to="/dashboard" />} />
-            {/* <Route path="/forgot-password" element = { <Navigate to="/dashboard" /> } /> */}
+            <Route path="/forgot-password" element = { <Navigate to="/dashboard" /> } />
             <Route path="/change-password" element = { <Navigate to="/dashboard" /> } />
             <Route path="/dashboard" element = { <Dashboard /> } />
             <Route path="/search" element = { <SearchDocument/> } />
@@ -51,7 +52,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            {/* <Route path="/forgot-password" element = { <ForgotPassword/> } /> */}
+            <Route path="/forgot-password" element = { <ForgotPassword/> } /> 
             <Route path="/change-password" element = { <ChangePassword/> } />
             <Route path="/search" element = { <Navigate to="/login" /> } />
           </>

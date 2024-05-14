@@ -470,10 +470,10 @@ const UserIconContainer = styled.div`
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedTitle, setSelectedTitle] = useState('');
-  const [title, setTitle] = useState('');
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [isFetching, setIsFetching] = useState(false); 
+  const [isFetching2, setIsFetching2] = useState(false); 
   const [searchResults, setSearchResults] = useState([]);
   const [titles, setTitles] = useState([]);
   const [selectedSummary, setSelectedSummary] = useState('');
@@ -491,8 +491,9 @@ const Sidebar = () => {
   const handleDocumentClick = async (title, summary) => {
     setSelectedTitle(title);
     setSelectedSummary(summary); 
+    console.log(title);
     setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
-    //setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
+    setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get('http://127.0.0.1:5000/getConversation', {
@@ -508,7 +509,10 @@ const Sidebar = () => {
           console.log('Conversation:', response.data.conversation);
       } else {
           // No conversation found or an empty list returned
-          setConversation([{ type: 'AI', text: `No existing conversation found for "${title}". Start a new conversation below:` }]);
+          setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
+          //setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
+         // setConversation([]);
+
       }
   } catch (error) {
       console.error('Error fetching conversation:', error);
@@ -568,7 +572,6 @@ const Sidebar = () => {
     setSearchResults([]); 
 
     console.log(searchQuery);
-    setTitle(title);
 
     try 
     {
@@ -681,7 +684,7 @@ const Sidebar = () => {
     setConversation(prev => [...prev, { type: 'User', text: userInput }]);
 
   
-    setIsFetching(true); 
+   // setIsFetching(true); 
   
     const token = localStorage.getItem('access_token');
     try {
@@ -716,7 +719,7 @@ const Sidebar = () => {
     } 
     finally 
     {
-      setIsFetching(false);
+     // setIsFetching(false);
       setUserInput('');
     }
   };
@@ -727,7 +730,7 @@ const Sidebar = () => {
         return;
     }
 
-    setIsFetching(true);  // Show a loading indicator if you have one
+    setIsFetching2(true); 
 
     const token = localStorage.getItem('access_token');
     try
@@ -756,7 +759,7 @@ const Sidebar = () => {
     } 
     finally 
     {
-        setIsFetching(false);  // Hide loading indicator
+        setIsFetching2(false);  
     }
 };
 
@@ -807,8 +810,8 @@ const Sidebar = () => {
                 <SearchIcon style={{marginLeft:"5px"}}/>
             </SearchButton>
 
-            <SearchButton onClick={handleSaveConversation} disabled={isFetching}>
-                {isFetching ? 'Saving...' : 'Save'}
+            <SearchButton onClick={handleSaveConversation} disabled={isFetching2}>
+                {isFetching2 ? 'Saving...' : 'Save'}
                 <SaveAltIcon style={{marginLeft:"5px"}}/>
             </SearchButton>
           </SearchContainer>
@@ -882,7 +885,7 @@ const Sidebar = () => {
                       position='left'
                       title='AI'
                       type='text'
-                      text="Hi! Start a new conversation by searching for a Wikipedia document title!"
+                      text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title!`}
                     />
                   </AiContainer>
     )}

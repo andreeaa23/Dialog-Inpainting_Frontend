@@ -219,7 +219,7 @@ const Login = () => {
                     id="password"
                     name="password"/>
                     <Description style={{marginRight: "50%"}}>
-                        <Link to='/change-password' style={{color: 'inherit'}}>
+                        <Link to='/forgot-password' style={{color: 'inherit'}}>
                         Forget password?
                         </Link>
                     </Description>

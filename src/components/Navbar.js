@@ -8,13 +8,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const Container = styled.div`
   position: fixed;
   height: 60px;
-  margin-left: 600px;
+  margin-left: 700px;
   background-color: transparent;
   z-index: 1000;
   width: 100%;
+
 
 `;
 
@@ -46,28 +48,25 @@ const Left = styled.div`
 
 const Right = styled.div`
   display: flex;
-  align-items: center; // Corrected from 'right' to 'center' for proper CSS value
+  align-items: center; 
   justify-content: flex-end;
-  margin-left: 780px;
+  margin-left: 680px;
   color: #e7ecef;
   font-size: 17px;
   font-weight: bold;
   cursor: pointer;
 
-  @media screen and (min-width: 856px) {
-    margin-left: 780px;
+
+  @media screen and (min-width: 1600px) {
+    margin-left: 680px;
   }
 
-  @media screen and (max-width: 905px) {
-    margin-left: 700px;
+  @media screen and (min-width > 1600px) {
+    margin-left: 590px; //de modif aici
   }
-
-
-
 `;
 
 const LogOutButton = styled.div`
-  //position: fixed;
   background-color: #427D9D;
   color: 7439db;
   padding: 7px 10px;
@@ -105,14 +104,10 @@ const LogOutText = styled.span`
 
 
 const Navbar = () => {
-
-    const navigate = useNavigate();
-
     const handleLogout = async () => 
     {
         localStorage.removeItem('access_token');
         localStorage.removeItem('username');
-        //localStorage.removeItem('lastSearchResults')
 
         toast.success('Successful Log Out!', {
             position: 'top-right',
@@ -125,18 +120,16 @@ const Navbar = () => {
             theme: 'colored',
         });
 
-       // navigate('/login');
-       // Wait for the toast to show before refreshing
     setTimeout(() => {
       window.location.href = '/login'; // Or use window.location.reload() for a hard refresh
-    }, 1000); // Adjust time as needed for the toast to be visible
+    }, 1000); 
   }
-
 
     return (
         <Container>
           <Wrapper>
             <Right>
+            {/* <HelpOutlineOutlinedIcon style={{marginRight: "5px"}}/> */}
             <LogOutButton onClick={handleLogout}>
               <LogOutText> Log Out </LogOutText> 
                     <LogOutIcon icon={LogoutIcon}/>

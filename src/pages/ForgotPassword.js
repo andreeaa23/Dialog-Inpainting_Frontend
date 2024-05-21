@@ -165,7 +165,6 @@ const LinkText = styled.h2`
   }
 `;
 
-//daca reset code  bun => redirectionare la change pass
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [receivedCode, setReceivedCode] = useState('');
@@ -186,17 +185,29 @@ const handleSubmit = async (e) => {
   e.preventDefault();
 
   setIsFetching(true);
-  try {
+  try 
+  {
       const response = await axios.post('http://127.0.0.1:5000/forgot-password', { email });
-      toast.success('Codul a fost trimis cu succes!');
+      toast.success('The code has been sent successfully!', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+    });
       setEmailSent(true);
-      setCodeVerified(false); // Reset code verification state
-  } catch (error) {
-      if (error.response && error.response.data.error === 'Email-ul introdus nu se regăsește in baza de date!') {
-          toast.error('Acest e-mail nu se află în baza de date!');
-      } else {
-          toast.error('Nu s-a putut trimite codul către acest e-mail!');
-      }
+      setCodeVerified(false); 
+  } 
+  catch (error) 
+  {
+      if (error.response && error.response.data.error === 'Email-ul introdus nu se regăsește in baza de date!') 
+          toast.error('The email you entered does not exist!');
+      else 
+          toast.error('Code could not be sent to this email!');
+      
   }
   setIsFetching(false);
 };
@@ -211,42 +222,52 @@ const handleCodeSubmit = async (e) => {
       resetCode: receivedCode
     });
     localStorage.setItem('email', email);
-    setCodeVerified(true); // Set to true when code is verified
-   // navigate('/change-password/'+ receivedCode);
-  } catch (error) {
-    if (error.response && error.response.data.error === 'Invalid reset code') {
-      toast.error('Cod de resetare invalid');
-    } else {
-      toast.error('A intervenit o eroare');
-    }
+    setCodeVerified(true);
+
+  } catch (error) 
+  {
+    if (error.response && error.response.data.error === 'Invalid reset code') 
+      toast.error('Invalid reset code!');
+    else 
+      toast.error('An error occurred!');
+    
   }
   setIsFetching2(false);
 };
 
-//sa fac apel la change-password sa trimit noua parola
 const handlePasswordChange = async (e) => {
   e.preventDefault();
-  if (newPassword !== confirmNewPassword) {
-    toast.error('Parolele nu corespund!');
+  if (newPassword !== confirmNewPassword) 
+  {
+    toast.error('The passwords do not match!');
     return;
   }
-  try {
-    // Assume JWT is stored in localStorage after login
 
-    const response = await axios.post('http://127.0.0.1:5000/change-password2', { email: email, password: newPassword });
-    toast.success(response.data.message);
-    navigate('/login'); // Redirect to login after successful password change
+  try {
+    const response = await axios.post('http://127.0.0.1:5000/change-password', { email: email, password: newPassword });
+    toast.success('Password change successfully!', {
+      position: 'top-right',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+  });
+
+    navigate('/login'); 
   }
-   catch (error) {
+   catch (error)
+  {
     if (error.response) 
-      toast.error(error.response.data.error || 'Failed to change password');
+      toast.error('Failed to change password!');
     else 
-      toast.error('An error occurred while changing the password');
+      toast.error('An error occurred while changing the password!');
     
   }
 
 };
-
 
   return (
     <Container  

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +16,8 @@ import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { MessageList } from "react-chat-elements"
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import HelpMenu from '../components/HelpMenu.js'
 
 const Container0 = styled.div`
   display: flex;
@@ -31,7 +33,6 @@ const Container = styled.div`
   width: 15%;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
-  /* border: 1px solid white; */
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 
 `;
@@ -43,8 +44,9 @@ const SearchContainer = styled.div`
   color: #e7ecef;
   font-size: 17;
   font-weight: bold;
-  width:30%;
+  width:40%;
   height: 100%;
+
 `
 const ChatContainer = styled.div`
   display: flex;
@@ -54,8 +56,6 @@ const ChatContainer = styled.div`
   height: 100%;
   margin-right: 1%;
   margin-left:1%;
-  /* background-color: pink; */
-  
 
 `
 const Input = styled.input`
@@ -67,6 +67,8 @@ const Input = styled.input`
   color: white;
   background-color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
+  
+ 
 
   &::placeholder { /* This targets the placeholder text */
   color: rgba(246, 246, 246, 0.8); /* Set the placeholder text color to semi-transparent white */
@@ -81,17 +83,7 @@ const Input = styled.input`
 
 `;
 
-const animateSearchBar = keyframes`
-  0% {
-    width: 300px;
-  }
-  100% {
-    width: 500px;
-  }
-`;
-
 const SearchButton = styled.div`
-  //position: fixed;
   background-color: #427D9D;
   color: 7439db;
   padding: 7px 10px;
@@ -200,55 +192,6 @@ const FixedSearchContainer = styled.div`
   
 `;
 
-// const InputChat = styled.input`
-//   padding: 10px;
-//   border: none;
-//   border-radius: 10px;
-//   width: 100%;
-//   font-size: 15px;
-//   color: white;
-//   background-color: rgba(255, 255, 255, 0.2);
-//   cursor: pointer;
-
-//   &::placeholder { 
-//   color: rgba(246, 246, 246, 0.8); 
-//     text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-//   }
-  
-//   &:focus {
-//     outline: none;
-//     background-color: rgba(255, 255, 255, 0.3);
-//   }
-
-
-// `;
-
-// const SearchIconContainer = styled.div`
-//   display: flex; 
-//   justify-content: center; 
-//   align-items: center; 
-//   background-color: #427D9D;
-//   color: white;
-//   padding: 7px 10px;
-//   border-radius: 5px;
-//   cursor: pointer;
-//   transition: all 0.3s ease-in-out;
-//   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-//   font-weight: bold;
-//   margin-left: 10px;
-//   border: 0.1px solid #9BBEC8;
-  
-//   &:hover {
-//     transform: translateY(-2px);
-//     background-color: #64CCC5;
-//     border: 0.1px solid #DAFFFB;
-//     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-//     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-//     font-weight: bold;
-//   }
-// `;
-
 const SearchIconContainer = styled.div`
   position: absolute;
   right: 10px;
@@ -276,7 +219,6 @@ const InputChatContainer = styled.div`
   overflow: hidden;
   border-radius: 10px;
 
-
 `;
 
 const InputChat = styled.input`
@@ -284,11 +226,11 @@ const InputChat = styled.input`
   padding-right: 50px;
   border: none;
   border-radius: 10px;
-  width: 100%; // Full width of its container
+  width: 100%; 
   font-size: 15px;
   color: white;
   background-color: rgba(255, 255, 255, 0.2);
-  cursor: text; // Use text cursor instead of pointer
+  cursor: text; 
 
   &::placeholder { 
     color: rgba(246, 246, 246, 0.8); 
@@ -374,7 +316,7 @@ const DocumentTitle = styled.h1`
   color: white;
   white-space: nowrap; 
   padding: 3px 4px;
-  cursor: pointer; //cand se apasa aici trb sa se creze un nou chat: o noua cautare dupa titlu + golire content container
+  cursor: pointer; 
   font-weight: normal;
 
   @media screen and (max-width: 768px) {
@@ -434,8 +376,6 @@ const AiContainer = styled.div`
 `;
 
 const AiIconContainer = styled.div`
-  /* position: absolute;  */
-
   width: 40px; 
   height: 50px; 
 
@@ -456,7 +396,6 @@ const UserContainer = styled.div`
 `;
 
 const UserIconContainer = styled.div`
-  /* position: absolute;  */
   width: 40px; 
   height: 40px; 
 
@@ -465,7 +404,6 @@ const UserIconContainer = styled.div`
     height: 35px; 
   }
 `;
-
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -483,6 +421,17 @@ const Sidebar = () => {
   const [AImessages, setAIMessages] = useState([]);
   const username = localStorage.getItem('username');
   const [conversation, setConversation] = useState([]);
+  const [helpMenuOpen, setHelpMenuOpen] = useState(false);
+  const contentRef = useRef(null);
+
+
+  const handleHelpMenuOpen = () => {
+    setHelpMenuOpen(true);
+  };
+
+  const handleHelpMenuClose = () => {
+    setHelpMenuOpen(false);
+  };
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -588,10 +537,10 @@ const Sidebar = () => {
             const results = Array.isArray(summaryResponse.data) 
                 ? summaryResponse.data 
                 : summaryResponse.data.split('\n');
-    
+
+            setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${searchQuery}.` }]);
             setSearchResults(results);
             setSelectedSummary(results.join('\n'));
-           // localStorage.setItem('lastSearchResults', JSON.stringify(results));
             console.log('Search results:', results);
             setTriggerFetch(true);
         } 
@@ -603,15 +552,9 @@ const Sidebar = () => {
     catch (error) 
     {
         if (error.response && error.response.status === 404)
-        {
             toast.error(error.response.data.message);
-
-        }
         else 
         {
-            //console.error('Error fetching search results:', error);
-            //toast.error('An error occurred while fetching search results.');
-            //toast.error('The page doesn\'t exist on English Wikipedia!');
             setTriggerFetch(true);
         }
     } 
@@ -641,6 +584,8 @@ const Sidebar = () => {
             // fetchTitles(); 
             setTriggerFetch(true);
             setSelectedSummary('');
+            setConversation([]);
+            setSelectedTitle('');
             toast.success('Title deleted successfully!');
         } else {
             console.error('Failed to delete the title');
@@ -662,11 +607,14 @@ const Sidebar = () => {
   const clearDialog = () => {
     setSelectedSummary(''); 
     setMessages([]); 
+    setConversation([]);
+    setSelectedTitle("");
+
   };
   
   const handleNewDialogClick = () => {
     if (isOpen) {
-      clearDialog(); // Only clear when the sidebar is open and going to be closed
+      clearDialog(); 
     }
   };
 
@@ -683,9 +631,6 @@ const Sidebar = () => {
 
     setConversation(prev => [...prev, { type: 'User', text: userInput }]);
 
-  
-   // setIsFetching(true); 
-  
     const token = localStorage.getItem('access_token');
     try {
       const response = await axios.post('http://127.0.0.1:5000/getAnswer', {
@@ -700,10 +645,14 @@ const Sidebar = () => {
       });
       console.log(userInput);
   
-      if (response.status === 200) {
-        const answer = response.data;
-        setConversation(prev => [...prev, { type: 'AI', text: `${answer}` }]);
-        console.log(answer);
+      if (response.status === 200) 
+      {
+        const responseText = response.data;
+        const answer = responseText.split('answer: ')[1];
+        const finalAnswer = answer.charAt(0).toUpperCase() + answer.slice(1)
+        
+        setConversation(prev => [...prev, { type: 'AI', text: `${finalAnswer}` }]);
+        console.log(finalAnswer);
         setAIMessages([...AImessages, answer]);
         toast.success('Answer fetched successfully!');
       } 
@@ -719,13 +668,13 @@ const Sidebar = () => {
     } 
     finally 
     {
-     // setIsFetching(false);
       setUserInput('');
     }
   };
 
   const handleSaveConversation = async () => {
-    if (!selectedTitle || conversation.length === 0) {
+    if (!selectedTitle || conversation.length === 0) 
+    {
         toast.error("No conversation to save or no title selected!");
         return;
     }
@@ -763,6 +712,14 @@ const Sidebar = () => {
     }
 };
 
+// const handleHelpMenu = () => {
+//   navigate('/helpMenu');
+// }
+useEffect(() => {
+  if (contentRef.current) {
+    contentRef.current.scrollTop = contentRef.current.scrollHeight;
+  }
+}, [conversation]);
   
   return (
     <Container0>
@@ -770,9 +727,9 @@ const Sidebar = () => {
           
         <ToggleButtonContainer>
           <ToggleButton onClick={toggleSidebar} isOpen={isOpen}>
-            {isOpen ? <ChatIcon /> : <ChatIcon style={{ fontSize: 20 }} />}
+            {isOpen ? <ChatIcon style={{marginTop:"2px"}}/> : <ChatIcon style={{ fontSize: 20 }} />}
           </ToggleButton>
-          <Title onClick={handleNewDialogClick} isOpen={isOpen}>{isOpen ? 'New Dialog' : null}</Title>
+          <Title onClick={handleNewDialogClick} isOpen={isOpen}>{isOpen ? 'New Conversation' : null}</Title>
         </ToggleButtonContainer>
 
         <SidebarContainer style={isOpen ? { width: '100%' } : { display: 'none'}}>
@@ -782,7 +739,7 @@ const Sidebar = () => {
                   <StyledButton
                     isOpen={isOpen}
                     onClick={() => handleDocumentClick(item.title, item.summary)} 
-                    style={isOpen ? { width: '195px' } : { width: '0%'}}
+                    style={isOpen ? { width: '207px' } : { width: '0%'}}
                   >
                     {isOpen && (
                       <ButtonContent>
@@ -805,7 +762,8 @@ const Sidebar = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <SearchButton onClick={handleSearch} disabled={isFetching}>
+            <SearchButton onClick={handleSearch} disabled={isFetching}
+            >
                 {isFetching ? 'Searching...' : 'Search'}
                 <SearchIcon style={{marginLeft:"5px"}}/>
             </SearchButton>
@@ -814,6 +772,12 @@ const Sidebar = () => {
                 {isFetching2 ? 'Saving...' : 'Save'}
                 <SaveAltIcon style={{marginLeft:"5px"}}/>
             </SearchButton>
+
+            <SearchButton onClick={handleHelpMenuOpen}>
+                Help
+                <HelpOutlineOutlinedIcon style={{marginLeft:"5px"}}/>
+            </SearchButton>
+            <HelpMenu open={helpMenuOpen} onClose={handleHelpMenuClose} />
           </SearchContainer>
 
           <DocumentContainer>
@@ -824,47 +788,14 @@ const Sidebar = () => {
             ))}
           </DocumentContainer>
 
-          <ContentContainer>
-          {/* {conversation.map((message, index) => {
-              if (message.type === 'AI') {
-                return (
-                  <AiContainer key={index}>
-                    <AiIconContainer>
-                      <img src={AI_Icon2} alt="AI Icon" />
-                    </AiIconContainer>
-                    <MessageBox
-                      position='left'
-                      title='AI'
-                      type='text'
-                      text={message.text}
-                    />
-                  </AiContainer>
-                );
-              } 
-              else {
-                return (
-                  <UserContainer key={index}>
-                    <MessageBox
-                      position="right"
-                      title={username}
-                      type="text"
-                      text={message.text}
-                    />
-                    <UserIconContainer>
-                      <img src={UserIcon} alt="User Icon" />
-                    </UserIconContainer>
-                  </UserContainer>
-                );
-              }
-            })} */}
-            {conversation && conversation.length > 0 ? (
-        conversation.map((message, index) => (
+          <ContentContainer ref={contentRef}>
+            {conversation && conversation.length > 0 ? (conversation.map((message, index) => (
             message.type === 'AI' ? (
                 <AiContainer key={index}>
                     <AiIconContainer>
                         <img src={AI_Icon2} alt="AI Icon" />
                     </AiIconContainer>
-                    <MessageBox position='left' title='AI' type='text' text={message.text} />
+                    <MessageBox position='left' title='WikiDialog' type='text' text={message.text} />
                 </AiContainer>
             ) : (
                 <UserContainer key={index}>
@@ -883,9 +814,9 @@ const Sidebar = () => {
                     </AiIconContainer>
                     <MessageBox
                       position='left'
-                      title='AI'
+                      title='WikiDialog'
                       type='text'
-                      text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title!`}
+                      text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title! See "Help Menu" for more details!`}
                     />
                   </AiContainer>
     )}

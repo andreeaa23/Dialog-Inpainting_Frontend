@@ -249,19 +249,9 @@ const Register = () => {
                 </Form>
             </FormContainer>
         </motion.h1>
+        <ToastContainer/>
       </InnerContainer>
-      <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
+
 
     </Container>
   )

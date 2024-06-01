@@ -7,6 +7,7 @@ import {Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { TypeAnimation } from 'react-type-animation';
 
 const Container = styled(motion.div)`
   position: relative;
@@ -17,6 +18,7 @@ const Container = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 
   &::before {
     content: '';
@@ -29,7 +31,7 @@ const Container = styled(motion.div)`
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    filter: blur(2px);
+    filter: blur(3px);
     z-index: -1;
   }
 
@@ -46,7 +48,7 @@ const FormContainer = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   border: 1px solid white;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
   opacity: 0.8;
   margin-top:20px;
@@ -71,6 +73,7 @@ const Input = styled.input`
   width: 20vw;
   border-radius: 10px;
   border: 1px solid grey;
+  box-shadow: 0 0 10px #427d9d;
 
 `;
 
@@ -123,6 +126,8 @@ const Description = styled.p`
   margin-top: 3px;
   margin-bottom: 15px;
   color: white;
+
+  
 
 `;
 
@@ -195,11 +200,27 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}>
+          <TypeAnimation
+        sequence={[
+          'Welcome to WikiDialog!',
+          1000,
+          'Start conversations based on Wikipedia topics',
+          1000,
+          'Please Log In or Sign Up to continue!',
+          1000,
+        ]}
+        deletionSpeed={90}
+        speed={50}
+        style={{ fontSize: '2em', color: 'white', marginBottom: '10px', fontWeight: 'bold',
+        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}
+        repeat={Infinity}
+      />
         <InnerContainer>
             <motion.h1
                 initial={{ opacity: 0, y: -50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}>
+                  
             <FormContainer>
                 <Form onSubmit={handleSubmit}>
                     <Title>Sign in</Title>

@@ -370,9 +370,14 @@ const AiContainer = styled.div`
   width: 100%;
   height: auto;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   margin-left: 10px; 
   margin-top: 10px; 
+`;
+
+const AiMessageContainer = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 const AiIconContainer = styled.div`
@@ -404,6 +409,44 @@ const UserIconContainer = styled.div`
     height: 35px; 
   }
 `;
+const RelevantQuestionsContainer = styled.div`
+  display: flex;
+  /* justify-content: space-around; */
+  flex-direction: column;
+  margin-top: 10px;
+  margin-left: 70px;
+  margin-right: 50px;
+`;
+
+const RelevantQuestionBox = styled.div`
+  background-color: #f6f6f6;
+  border: 1px solid #427D9D;
+  border-radius: 10px;
+  padding: 0px;
+  width: 30%;
+  height: 40px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-right: 10px;
+  font-size: 12px;
+  
+
+  &:hover {
+    background-color: #427D9D;
+    color: white;
+  }
+`;
+
+const TextStyle = styled.p`
+  font-size: 12px;
+  font-weight: bold;
+  color: #427D9D;
+  margin-left: 3px;
+`;
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -423,6 +466,50 @@ const Sidebar = () => {
   const [conversation, setConversation] = useState([]);
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
   const contentRef = useRef(null);
+
+  const [questions, setQuestions] = useState(["What is Inna's most popular song?"]);
+
+  const fetchQuestions = async (title) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await axios.post('http://127.0.0.1:5000/getQuestion', {
+        title: title,
+       
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      console.log(response.data);
+      const responseText = response.data;
+      const question = responseText.split('question: ')[1];
+      setQuestions(question);
+
+    } 
+    catch (error) 
+    {
+      console.error('Error fetching questions:', error);
+    } 
+  };
+
+  useEffect(() => {
+    if (selectedTitle) {
+      fetchQuestions(selectedTitle);
+    }
+  }, [selectedTitle]);
+
+  const renderRelevantQuestions = (question) => (
+    <RelevantQuestionsContainer>
+      <TextStyle>Predicted masked question:</TextStyle>
+      {/* {questions.map((question, index) => ( */}
+        {/* <RelevantQuestionBox key={index}> */}
+        <RelevantQuestionBox>
+          {question}
+        </RelevantQuestionBox>
+      {/* ))} */}
+    </RelevantQuestionsContainer>
+  );
 
 
   const handleHelpMenuOpen = () => {
@@ -789,38 +876,46 @@ useEffect(() => {
           </DocumentContainer>
 
           <ContentContainer ref={contentRef}>
-            {conversation && conversation.length > 0 ? (conversation.map((message, index) => (
-            message.type === 'AI' ? (
-                <AiContainer key={index}>
-                    <AiIconContainer>
-                        <img src={AI_Icon2} alt="AI Icon" />
-                    </AiIconContainer>
-                    <MessageBox position='left' title='WikiDialog' type='text' text={message.text} />
-                </AiContainer>
+      {conversation && conversation.length > 0 ? (
+        conversation.map((message, index) => (
+          <AiContainer key={index}>
+            {message.type === 'AI' ? (
+              <>
+                <AiMessageContainer>
+                  <AiIconContainer>
+                    <img src={AI_Icon2} alt="AI Icon" />
+                  </AiIconContainer>
+                  <MessageBox position='left' title='WikiDialog' type='text' text={message.text} />
+                </AiMessageContainer>
+                {renderRelevantQuestions(questions)}
+              </>
             ) : (
-                <UserContainer key={index}>
-                    <MessageBox position="right" title={username} type="text" text={message.text} />
-                    <UserIconContainer>
-                        <img src={UserIcon} alt="User Icon" />
-                    </UserIconContainer>
-                </UserContainer>
-            )
+              <UserContainer>
+                <MessageBox position="right" title={username} type="text" text={message.text} />
+                <UserIconContainer>
+                  <img src={UserIcon} alt="User Icon" />
+                </UserIconContainer>
+              </UserContainer>
+            )}
+          </AiContainer>
         ))
-    ) : (
-
-        <AiContainer >
-                    <AiIconContainer>
-                      <img src={AI_Icon2} alt="AI Icon" />
-                    </AiIconContainer>
-                    <MessageBox
-                      position='left'
-                      title='WikiDialog'
-                      type='text'
-                      text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title! See "Help Menu" for more details!`}
-                    />
-                  </AiContainer>
-    )}
-          </ContentContainer>
+      ) : (
+        <AiContainer>
+          <AiMessageContainer>
+            <AiIconContainer>
+              <img src={AI_Icon2} alt="AI Icon" />
+            </AiIconContainer>
+            <MessageBox
+              position='left'
+              title='WikiDialog'
+              type='text'
+              text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title! See "Help Menu" for more details!`}
+            />
+          </AiMessageContainer>
+          {renderRelevantQuestions(questions)}
+        </AiContainer>
+      )}
+    </ContentContainer>
 
           <FixedSearchContainer>
             <InputChatContainer>

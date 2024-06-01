@@ -29,7 +29,7 @@ const Container = styled(motion.div)`
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    filter: blur(2px);
+    filter: blur(3px);
     z-index: -1;
   }
 
@@ -46,7 +46,7 @@ const FormContainer = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(5px);
   border: 1px solid white;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.6);
   border-radius: 10px;
   opacity: 0.8;
   margin-top:20px;

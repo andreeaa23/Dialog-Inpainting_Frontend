@@ -18,6 +18,7 @@ import { MessageList } from "react-chat-elements"
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import HelpMenu from '../components/HelpMenu.js'
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 
 const Container0 = styled.div`
   display: flex;
@@ -101,7 +102,7 @@ const SearchButton = styled.div`
 
   &:hover {
     transform: translateY(-2px);
-    background-color: #64CCC5;
+    background-color: #00B8D4;
     border: 0.1px solid #DAFFFB;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -344,8 +345,8 @@ const StyledButton = styled.button`
 
   &:hover {
     font-weight: bold;
-    background-color: #64CCC5;
-    border: 2px solid #64CCC5;
+    background-color: #00B8D4;
+    border: 2px solid #00B8D4;
     color: white;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   }
@@ -436,16 +437,19 @@ const RelevantQuestionBox = styled.div`
   
 
   &:hover {
-    background-color: #427D9D;
+    background-color: #00B8D4;
     color: white;
   }
 `;
 
 const TextStyle = styled.p`
+display: flex;
+flex-direction: row;
   font-size: 12px;
   font-weight: bold;
-  color: #427D9D;
+  color: #00E5FF;
   margin-left: 3px;
+  align-items: center;
 `;
 
 const Sidebar = () => {
@@ -465,14 +469,24 @@ const Sidebar = () => {
   const username = localStorage.getItem('username');
   const [conversation, setConversation] = useState([]);
   const [helpMenuOpen, setHelpMenuOpen] = useState(false);
+  const [answer, setAnswer] = useState([]);
+  const [isFirstAnswer, setIsFirstAnswer] = useState(false);
+  const [showRelevantQuestions, setShowRelevantQuestions] = useState(false);
   const contentRef = useRef(null);
+  const [questions, setQuestions] = useState('');
+  
 
-  const [questions, setQuestions] = useState(["What is Inna's most popular song?"]);
+  useEffect(() => {
+    if (isFirstAnswer) {
+      setShowRelevantQuestions(true);
+    }
+  }, [isFirstAnswer]);
 
   const fetchQuestions = async (title) => {
+    setQuestions('Predicting...');
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.post('http://127.0.0.1:5000/getQuestion', {
+      const response = await axios.post('http://127.0.0.1:5000/InpainterGenerateQuestions', {
         title: title,
        
       }, {
@@ -482,9 +496,21 @@ const Sidebar = () => {
         }
       });
       console.log(response.data);
-      const responseText = response.data;
-      const question = responseText.split('question: ')[1];
-      setQuestions(question);
+      const { question, answer } = response.data;
+      let formattedQuestion = question.split('question: ')[1];
+    if (formattedQuestion && !formattedQuestion.trim().endsWith('?')) {
+      formattedQuestion = formattedQuestion.trim() + '?';
+    }
+
+    if (formattedQuestion) {
+      formattedQuestion = formattedQuestion.trim();
+      formattedQuestion = formattedQuestion.charAt(0).toUpperCase() + formattedQuestion.slice(1);
+    }
+    console.log(formattedQuestion);
+    setQuestions(formattedQuestion);
+   // setQuestions(prevQuestions => [...prevQuestions, formattedQuestion]);
+    setAnswer(answer);
+    setIsFirstAnswer(true);  // Set this to true to trigger the display of relevant questions
 
     } 
     catch (error) 
@@ -499,18 +525,35 @@ const Sidebar = () => {
     }
   }, [selectedTitle]);
 
+
+
   const renderRelevantQuestions = (question) => (
-    <RelevantQuestionsContainer>
-      <TextStyle>Predicted masked question:</TextStyle>
-      {/* {questions.map((question, index) => ( */}
-        {/* <RelevantQuestionBox key={index}> */}
-        <RelevantQuestionBox>
-          {question}
-        </RelevantQuestionBox>
-      {/* ))} */}
+    <RelevantQuestionsContainer onClick={() => handleQuestionClick(question)}>
+      <TextStyle>
+        <AutoFixHighIcon style={{ fontSize: '20px' }} />
+        Predicted masked question:
+      </TextStyle>
+      <RelevantQuestionBox>
+        {question}
+      </RelevantQuestionBox>
     </RelevantQuestionsContainer>
   );
 
+  const handleQuestionClick = (question) => {
+
+    setMessages([...messages, question]);
+    console.log(messages);
+    
+    setConversation(prev => [...prev, { type: 'User', text: `${question }`}]); //aici afiseaza in front
+    console.log(conversation);
+
+    setAIMessages([...AImessages, answer]);
+    setConversation(prev => [...prev, { type: 'AI', text: `${answer}` }]); 
+
+    
+    fetchQuestions(selectedTitle);
+  };
+ console.log(conversation);
 
   const handleHelpMenuOpen = () => {
     setHelpMenuOpen(true);
@@ -799,14 +842,13 @@ const Sidebar = () => {
     }
 };
 
-// const handleHelpMenu = () => {
-//   navigate('/helpMenu');
-// }
-useEffect(() => {
-  if (contentRef.current) {
-    contentRef.current.scrollTop = contentRef.current.scrollHeight;
-  }
-}, [conversation]);
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = contentRef.current.scrollHeight;
+    }
+  }, [conversation]);
+
+  const lastAIIndex = conversation.map((message, index) => (message.type === 'AI' ? index : null)).filter(index => index !== null).pop();
   
   return (
     <Container0>
@@ -887,7 +929,12 @@ useEffect(() => {
                   </AiIconContainer>
                   <MessageBox position='left' title='WikiDialog' type='text' text={message.text} />
                 </AiMessageContainer>
-                {renderRelevantQuestions(questions)}
+                {/* {showRelevantQuestions ? renderRelevantQuestions(questions) :       
+            <TextStyle style={{cursor: 'pointer'}} onClick={() => setShowRelevantQuestions(true)}>
+              <AutoFixHighIcon style={{ fontSize: '20px' }} />
+              Predicting...
+            </TextStyle>} */}
+            {index === lastAIIndex && showRelevantQuestions && renderRelevantQuestions(questions)}
               </>
             ) : (
               <UserContainer>
@@ -912,7 +959,8 @@ useEffect(() => {
               text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title! See "Help Menu" for more details!`}
             />
           </AiMessageContainer>
-          {renderRelevantQuestions(questions)}
+          {/* {!isFirstAnswer && selectedTitle && renderRelevantQuestions(questions)} */}
+          {showRelevantQuestions ? renderRelevantQuestions(questions) : null}
         </AiContainer>
       )}
     </ContentContainer>

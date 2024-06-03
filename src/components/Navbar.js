@@ -83,8 +83,8 @@ const LogOutButton = styled.div`
 
   &:hover {
     transform: translateY(-2px);
-    background-color: #64CCC5;
-    border: 2px solid #64CCC5;
+    background-color: #00B8D4;
+    border: 2px solid #00B8D4;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     font-weight: bold;

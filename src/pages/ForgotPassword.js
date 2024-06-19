@@ -187,7 +187,7 @@ const handleSubmit = async (e) => {
   setIsFetching(true);
   try 
   {
-      const response = await axios.post('http://127.0.0.1:5000/forgot-password', { email });
+      const response = await axios.post('http://4.211.152.86:5000/forgot-password', { email });
       toast.success('The code has been sent successfully!', {
         position: 'top-right',
         autoClose: 3000,
@@ -217,7 +217,7 @@ const handleCodeSubmit = async (e) => {
 
   setIsFetching2(true);
   try {
-    const response = await axios.post('http://127.0.0.1:5000/verify-reset-code', {
+    const response = await axios.post('http://4.211.152.86:5000/verify-reset-code', {
       email,
       resetCode: receivedCode
     });
@@ -244,7 +244,7 @@ const handlePasswordChange = async (e) => {
   }
 
   try {
-    const response = await axios.post('http://127.0.0.1:5000/change-password', { email: email, password: newPassword });
+    const response = await axios.post('http://4.211.152.86:5000/change-password', { email: email, password: newPassword });
     toast.success('Password change successfully!', {
       position: 'top-right',
       autoClose: 3000,

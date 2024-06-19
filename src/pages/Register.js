@@ -172,7 +172,7 @@ const Register = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('http://127.0.0.1:5000/register', {
+      const response = await axios.post('http://4.211.152.86:5000/register', {
         email: email,
         username: username,
         password: password

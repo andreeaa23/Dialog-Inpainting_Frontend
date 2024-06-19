@@ -19,6 +19,7 @@ import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import HelpMenu from '../components/HelpMenu.js'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import LoadingDots from './LoadingDots';
 
 const Container0 = styled.div`
   display: flex;
@@ -372,7 +373,7 @@ const AiContainer = styled.div`
   height: auto;
   display: flex;
   flex-direction: column;
-  margin-left: 10px; 
+  margin-left: 5px; 
   margin-top: 10px; 
 `;
 
@@ -399,6 +400,7 @@ const UserContainer = styled.div`
   position: right;
   margin-top: 20px; 
   justify-content: flex-end;
+
 `;
 
 const UserIconContainer = styled.div`
@@ -417,6 +419,7 @@ const RelevantQuestionsContainer = styled.div`
   margin-top: 10px;
   margin-left: 70px;
   margin-right: 50px;
+  margin-bottom: 10px;
 `;
 
 const RelevantQuestionBox = styled.div`
@@ -479,10 +482,33 @@ const Sidebar = () => {
   useEffect(() => {
     if (isFirstAnswer) {
       setShowRelevantQuestions(true);
+    
+      
+      toast.success('Predincting question, please wait!', {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+    });
+      
     }
   }, [isFirstAnswer]);
 
   const fetchQuestions = async (title) => {
+  //   toast.success('Predincting question, please wait!', {
+  //     position: 'top-right',
+  //     autoClose: 5000,
+  //     hideProgressBar: false,
+  //     closeOnClick: true,
+  //     pauseOnHover: true,
+  //     draggable: true,
+  //     progress: undefined,
+  //     theme: 'colored',
+  // });
     setQuestions('Predicting...');
     try {
       const token = localStorage.getItem('access_token');
@@ -534,7 +560,7 @@ const Sidebar = () => {
         Predicted masked question:
       </TextStyle>
       <RelevantQuestionBox>
-        {question}
+      {questions === 'Predicting...' ? <LoadingDots /> : questions}
       </RelevantQuestionBox>
     </RelevantQuestionsContainer>
   );
@@ -573,6 +599,17 @@ const Sidebar = () => {
     console.log(title);
     setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
     setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
+          
+    toast.success('Predincting question, please wait!', {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+  });
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get('http://127.0.0.1:5000/getConversation', {
@@ -940,7 +977,7 @@ const Sidebar = () => {
               <UserContainer>
                 <MessageBox position="right" title={username} type="text" text={message.text} />
                 <UserIconContainer>
-                  <img src={UserIcon} alt="User Icon" />
+                  <img src={UserIcon} alt="User Icon"/>
                 </UserIconContainer>
               </UserContainer>
             )}

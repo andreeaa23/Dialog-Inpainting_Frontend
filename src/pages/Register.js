@@ -7,6 +7,7 @@ import {Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import { TypeAnimation } from 'react-type-animation';
 
 const Container = styled(motion.div)`
   position: relative;
@@ -17,7 +18,8 @@ const Container = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-
+  flex-direction: column;
+  
   &::before {
     content: '';
     position: absolute;
@@ -208,6 +210,21 @@ const Register = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}>
+          <TypeAnimation
+        sequence={[
+          'Welcome to WikiDialog!',
+          1000,
+          'Start conversations based on Wikipedia topics',
+          1000,
+          'Please Log In or Sign Up to continue!',
+          1000,
+        ]}
+        deletionSpeed={90}
+        speed={50}
+        style={{ fontSize: '2em', color: 'white', marginBottom: '10px', fontWeight: 'bold',
+        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}
+        repeat={Infinity}
+      />
         <InnerContainer>
             <motion.h1
                 initial={{ opacity: 0, y: -50 }}

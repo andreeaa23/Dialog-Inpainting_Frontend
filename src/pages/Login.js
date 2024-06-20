@@ -199,7 +199,7 @@ const Login = () => {
     <Container  
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}>
+        /*transition={{ duration: 1 }}*/>
           <TypeAnimation
         sequence={[
           'Welcome to WikiDialog!',

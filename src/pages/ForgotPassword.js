@@ -330,7 +330,7 @@ const handlePasswordChange = async (e) => {
               </Form>
             )}
                 <LinkContainer>
-                    <Link to='chane-password'>
+                    <Link to='/login'>
                       <LinkText>Back to Login</LinkText>
                     </Link>
                 </LinkContainer>

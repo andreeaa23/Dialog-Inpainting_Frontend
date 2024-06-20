@@ -173,7 +173,7 @@ const Login = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('https://4.211.152.86:5000/login', {
+      const response = await axios.post('https://wikidialog.me/login', {
         username: username,
         password: password
       })

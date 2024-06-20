@@ -1,6 +1,6 @@
 import './App.css';
 import Login from './pages/Login.js';
-import {  Router, Routes, Route, Navigate, useLocation, BrowserRouter } from 'react-router-dom';
+import {  Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import  Register from "./pages/Register";
 import  Dashboard  from "./pages/Dashboard";

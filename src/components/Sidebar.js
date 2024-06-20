@@ -512,7 +512,7 @@ const Sidebar = () => {
     setQuestions('Predicting...');
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.post('http://4.211.152.86:5000/InpainterGenerateQuestions', {
+      const response = await axios.post('https://wikidialog.me/InpainterGenerateQuestions', {
         title: title,
        
       }, {
@@ -612,7 +612,7 @@ const Sidebar = () => {
   });
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get('http://4.211.152.86:5000/getConversation', {
+      const response = await axios.get('https://wikidialog.me/getConversation', {
           headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -652,7 +652,7 @@ const Sidebar = () => {
   const fetchTitles = async () => {
     const token = localStorage.getItem('access_token');
     try {
-        const response = await axios.get('http://4.211.152.86:5000/getTitles', {
+        const response = await axios.get('https://wikidialog.me/getTitles', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -692,7 +692,7 @@ const Sidebar = () => {
     try 
     {
         const token = localStorage.getItem('access_token');
-        const summaryResponse = await axios.get('http://4.211.152.86:5000/getSummary', {
+        const summaryResponse = await axios.get('https://wikidialog.me/getSummary', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -740,7 +740,7 @@ const Sidebar = () => {
     }
   
     const token = localStorage.getItem('access_token');
-    axios.post('http://4.211.152.86:5000/deleteTitle', { title: titleToDelete }, {
+    axios.post('https://wikidialog.me/deleteTitle', { title: titleToDelete }, {
       headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -800,7 +800,7 @@ const Sidebar = () => {
 
     const token = localStorage.getItem('access_token');
     try {
-      const response = await axios.post('http://4.211.152.86:5000/getAnswer', {
+      const response = await axios.post('https://wikidialog.me/getAnswer', {
         title: selectedTitle,
         question: userInput
        
@@ -852,7 +852,7 @@ const Sidebar = () => {
     try
     {
         console.log(conversation);
-        const response = await axios.post('http://4.211.152.86:5000/saveConversation', {
+        const response = await axios.post('https://wikidialog.me/saveConversation', {
             title: selectedTitle,
             conversation: conversation
         }, {

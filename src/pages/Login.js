@@ -173,7 +173,7 @@ const Login = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('http://4.211.152.86:5000/login', {
+      const response = await axios.post('https://4.211.152.86:5000/login', {
         username: username,
         password: password
       })
@@ -199,7 +199,7 @@ const Login = () => {
     <Container  
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        /*transition={{ duration: 1 }}*/>
+        transition={{ duration: 1 }}>
           <TypeAnimation
         sequence={[
           'Welcome to WikiDialog!',

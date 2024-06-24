@@ -211,7 +211,7 @@ const Login = () => {
         ]}
         deletionSpeed={90}
         speed={50}
-        style={{ fontSize: '2em', color: 'white', marginBottom: '10px', fontWeight: 'bold',
+        style={{ fontSize: '2em', color: 'white', marginBottom: '10px', fontWeight: 'bold', marginRight: '10px',
         textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}
         repeat={Infinity}
       />

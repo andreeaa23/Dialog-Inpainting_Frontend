@@ -628,7 +628,7 @@ const Sidebar = () => {
   finally {
     setTimeout(() => {
       setActiveButton(null);
-    }, 25000);
+    }, 30000);
   }
   };
 

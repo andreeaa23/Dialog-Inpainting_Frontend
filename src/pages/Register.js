@@ -172,7 +172,7 @@ const Register = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('https://wikidialog.me/register', {
+      const response = await axios.post('http://localhost:5000/register', {
         email: email,
         username: username,
         password: password

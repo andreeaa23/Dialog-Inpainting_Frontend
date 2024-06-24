@@ -4,7 +4,6 @@ import {  Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import {jwtDecode} from 'jwt-decode';
 import  Register from "./pages/Register";
 import  Dashboard  from "./pages/Dashboard";
-import SearchDocument from './pages/SearchDocument.js';
 import ForgotPassword from './pages/ForgotPassword.js';
 import HelpMenu from './components/HelpMenu.js';
 
@@ -43,7 +42,6 @@ const App = () => {
             <Route path="/register" element={<Navigate to="/dashboard" />} />
             <Route path="/forgot-password" element = { <Navigate to="/dashboard" /> } />
             <Route path="/dashboard" element = { <Dashboard /> } />
-            <Route path="/search" element = { <SearchDocument/> } />
             <Route path='/helpMenu' element = { <HelpMenu/> } />
           </>
         ) : (
@@ -53,7 +51,6 @@ const App = () => {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/forgot-password" element = { <ForgotPassword/> } /> 
-            <Route path="/search" element = { <Navigate to="/login" /> } />
           </>
         )}
     </Routes>

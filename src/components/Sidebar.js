@@ -477,12 +477,11 @@ const Sidebar = () => {
   const [showRelevantQuestions, setShowRelevantQuestions] = useState(false);
   const contentRef = useRef(null);
   const [questions, setQuestions] = useState('');
-  
+  const [activeButton, setActiveButton] = useState(null);
 
   useEffect(() => {
     if (isFirstAnswer) {
       setShowRelevantQuestions(true);
-    
       
       toast.success('Predincting question, please wait!', {
         position: 'top-right',
@@ -499,20 +498,10 @@ const Sidebar = () => {
   }, [isFirstAnswer]);
 
   const fetchQuestions = async (title) => {
-  //   toast.success('Predincting question, please wait!', {
-  //     position: 'top-right',
-  //     autoClose: 5000,
-  //     hideProgressBar: false,
-  //     closeOnClick: true,
-  //     pauseOnHover: true,
-  //     draggable: true,
-  //     progress: undefined,
-  //     theme: 'colored',
-  // });
     setQuestions('Predicting...');
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.post('https://wikidialog.me/InpainterGenerateQuestions', {
+      const response = await axios.post('http://localhost:5000/InpainterGenerateQuestions', {
         title: title,
        
       }, {
@@ -521,7 +510,7 @@ const Sidebar = () => {
           Authorization: `Bearer ${token}`,
         }
       });
-      console.log(response.data);
+      //console.log(response.data);
       const { question, answer } = response.data;
       let formattedQuestion = question.split('question: ')[1];
     if (formattedQuestion && !formattedQuestion.trim().endsWith('?')) {
@@ -532,7 +521,7 @@ const Sidebar = () => {
       formattedQuestion = formattedQuestion.trim();
       formattedQuestion = formattedQuestion.charAt(0).toUpperCase() + formattedQuestion.slice(1);
     }
-    console.log(formattedQuestion);
+    //console.log(formattedQuestion);
     setQuestions(formattedQuestion);
    // setQuestions(prevQuestions => [...prevQuestions, formattedQuestion]);
     setAnswer(answer);
@@ -568,10 +557,10 @@ const Sidebar = () => {
   const handleQuestionClick = (question) => {
 
     setMessages([...messages, question]);
-    console.log(messages);
+    //console.log(messages);
     
     setConversation(prev => [...prev, { type: 'User', text: `${question }`}]); //aici afiseaza in front
-    console.log(conversation);
+   // console.log(conversation);
 
     setAIMessages([...AImessages, answer]);
     setConversation(prev => [...prev, { type: 'AI', text: `${answer}` }]); 
@@ -579,7 +568,7 @@ const Sidebar = () => {
     
     fetchQuestions(selectedTitle);
   };
- console.log(conversation);
+ //console.log(conversation);
 
   const handleHelpMenuOpen = () => {
     setHelpMenuOpen(true);
@@ -593,16 +582,17 @@ const Sidebar = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleDocumentClick = async (title, summary) => {
+  const handleDocumentClick = async (title, summary, index) => {
+    setActiveButton(index);
     setSelectedTitle(title);
     setSelectedSummary(summary); 
     console.log(title);
     setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
     setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
           
-    toast.success('Predincting question, please wait!', {
+    toast.success('Predicting question, please wait!', {
       position: 'top-right',
-      autoClose: 5000,
+      autoClose: 6000,
       hideProgressBar: false,
       closeOnClick: true,
       pauseOnHover: true,
@@ -612,7 +602,7 @@ const Sidebar = () => {
   });
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get('https://wikidialog.me/getConversation', {
+      const response = await axios.get('http://localhost:5000/getConversation', {
           headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -622,7 +612,7 @@ const Sidebar = () => {
 
       if (response.status === 200 && response.data?.conversation?.length > 0) {
           setConversation(response.data.conversation);
-          console.log('Conversation:', response.data.conversation);
+          //console.log('Conversation:', response.data.conversation);
       } else {
           // No conversation found or an empty list returned
           setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
@@ -634,6 +624,11 @@ const Sidebar = () => {
       console.error('Error fetching conversation:', error);
      // setConversation([{ type: 'AI', text: `Failed to load conversation for "${title}". You may start a new conversation.` }]);
      setConversation([]);
+  }
+  finally {
+    setTimeout(() => {
+      setActiveButton(null);
+    }, 25000);
   }
   };
 
@@ -652,7 +647,7 @@ const Sidebar = () => {
   const fetchTitles = async () => {
     const token = localStorage.getItem('access_token');
     try {
-        const response = await axios.get('https://wikidialog.me/getTitles', {
+        const response = await axios.get('http://localhost:5000/getTitles', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -683,16 +678,28 @@ const Sidebar = () => {
         toast.error("Please fill the search field!");
         return;
     }
+    setSelectedTitle(searchQuery);
+    toast.success('Predicting question, please wait!', {
+      position: 'top-right',
+      autoClose: 6000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+  });
     e.preventDefault();
     setIsFetching(true);
     setSearchResults([]); 
 
-    console.log(searchQuery);
+
+    //console.log(searchQuery);
 
     try 
     {
         const token = localStorage.getItem('access_token');
-        const summaryResponse = await axios.get('https://wikidialog.me/getSummary', {
+        const summaryResponse = await axios.get('http://localhost:5000/getSummary', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -708,7 +715,7 @@ const Sidebar = () => {
             setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${searchQuery}.` }]);
             setSearchResults(results);
             setSelectedSummary(results.join('\n'));
-            console.log('Search results:', results);
+           // console.log('Search results:', results);
             setTriggerFetch(true);
         } 
         else 
@@ -740,7 +747,7 @@ const Sidebar = () => {
     }
   
     const token = localStorage.getItem('access_token');
-    axios.post('https://wikidialog.me/deleteTitle', { title: titleToDelete }, {
+    axios.post('http://localhost:5000/deleteTitle', { title: titleToDelete }, {
       headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -797,10 +804,20 @@ const Sidebar = () => {
     }
 
     setConversation(prev => [...prev, { type: 'User', text: userInput }]);
+        toast.success('Predicting answer, please wait!', {
+      position: 'top-right',
+      autoClose: 6000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'colored',
+  });
 
     const token = localStorage.getItem('access_token');
     try {
-      const response = await axios.post('https://wikidialog.me/getAnswer', {
+      const response = await axios.post('http://localhost:5000/getAnswer', {
         title: selectedTitle,
         question: userInput
        
@@ -810,7 +827,7 @@ const Sidebar = () => {
           Authorization: `Bearer ${token}`,
         }
       });
-      console.log(userInput);
+      //console.log(userInput);
   
       if (response.status === 200) 
       {
@@ -819,7 +836,7 @@ const Sidebar = () => {
         const finalAnswer = answer.charAt(0).toUpperCase() + answer.slice(1)
         
         setConversation(prev => [...prev, { type: 'AI', text: `${finalAnswer}` }]);
-        console.log(finalAnswer);
+        //console.log(finalAnswer);
         setAIMessages([...AImessages, answer]);
         toast.success('Answer fetched successfully!');
       } 
@@ -851,8 +868,8 @@ const Sidebar = () => {
     const token = localStorage.getItem('access_token');
     try
     {
-        console.log(conversation);
-        const response = await axios.post('https://wikidialog.me/saveConversation', {
+       // console.log(conversation);
+        const response = await axios.post('http://localhost:5000/saveConversation', {
             title: selectedTitle,
             conversation: conversation
         }, {
@@ -904,8 +921,9 @@ const Sidebar = () => {
                 <li key={index}>
                   <StyledButton
                     isOpen={isOpen}
-                    onClick={() => handleDocumentClick(item.title, item.summary)} 
+                    onClick={() => handleDocumentClick(item.title, item.summary, index)} 
                     style={isOpen ? { width: '207px' } : { width: '0%'}}
+                    disabled={activeButton !== null && activeButton !== index}
                   >
                     {isOpen && (
                       <ButtonContent>

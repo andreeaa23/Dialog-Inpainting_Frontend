@@ -173,7 +173,7 @@ const Login = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('https://wikidialog.me/login', {
+      const response = await axios.post('http://localhost:5000/login', {
         username: username,
         password: password
       })
@@ -241,7 +241,7 @@ const Login = () => {
                     name="password"/>
                     <Description style={{marginRight: "50%"}}>
                         <Link to='/forgot-password' style={{color: 'inherit'}}>
-                        Forget password?
+                        Forgot password?
                         </Link>
                     </Description>
                     {isFetching ? (<Spinner/>) : (<Button>Login</Button>)}

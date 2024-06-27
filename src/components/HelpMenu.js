@@ -32,9 +32,8 @@ const HelpMenu = ({ open, onClose }) => {
 2. <b>View Content</b>: Once you search for a title, the relevant content from Wikipedia will be displayed.</p>
 
 <p><b style={{ color: '#427D9D' }}>Starting a Conversation</b></p>
-<p>1. <b>New Conversation</b>: After viewing the content, you can start a new conversation by clicking on a title.<br />
-2. <b>Ask Questions</b>: In the conversation, you can ask questions related to the displayed content.<br />
-3. <b>Get Answers</b>: The app will provide answers to your questions based on the information available.</p>
+<p>1. <b>Ask Questions</b>: In the conversation, you can ask questions related to the displayed content or you can select a suggested question.<br />
+2. <b>Get Answers</b>: The app will provide answers to your questions based on the information available.</p>
 
 <p><b style={{ color: '#427D9D' }}>Managing Conversations</b></p>
 <p>1. <b>Save Conversation</b>: If you find the conversation useful, you can save it for future reference by clicking the "Save" button.<br />

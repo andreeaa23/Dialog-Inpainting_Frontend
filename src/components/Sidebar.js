@@ -546,7 +546,7 @@ const Sidebar = () => {
     <RelevantQuestionsContainer onClick={() => handleQuestionClick(question)}>
       <TextStyle>
         <AutoFixHighIcon style={{ fontSize: '20px' }} />
-        Predicted masked question:
+        Suggested question:
       </TextStyle>
       <RelevantQuestionBox>
       {questions === 'Predicting...' ? <LoadingDots /> : questions}

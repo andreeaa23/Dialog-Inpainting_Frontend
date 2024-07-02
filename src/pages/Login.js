@@ -54,7 +54,6 @@ const FormContainer = styled.div`
   margin-top:20px;
   align-items:center;
 
-
 `;
 
 const Form = styled.form`
@@ -127,8 +126,11 @@ const Description = styled.p`
   margin-bottom: 15px;
   color: white;
 
-  
+`;
 
+const TypeAnimationContainer = styled.div`
+  position: relative;
+  left: 2%; /* Adjust this value to move the text to the right */
 `;
 
 const Spinner = styled.div`
@@ -173,7 +175,7 @@ const Login = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('http://localhost:5000/login', {
+      const response = await axios.post('https://wikidialog.me/login', {
         username: username,
         password: password
       })
@@ -182,7 +184,6 @@ const Login = () => {
       localStorage.setItem('username', username);
       console.log(response.data);
 
-      //redirect to dashboard if successful login
       navigate('/dashboard');
 
       } 
@@ -200,6 +201,7 @@ const Login = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}>
+        <TypeAnimationContainer>
           <TypeAnimation
         sequence={[
           'Welcome to WikiDialog!',
@@ -215,6 +217,7 @@ const Login = () => {
         textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}
         repeat={Infinity}
       />
+      </TypeAnimationContainer>
         <InnerContainer>
             <motion.h1
                 initial={{ opacity: 0, y: -50 }}

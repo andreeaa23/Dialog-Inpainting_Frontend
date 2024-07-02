@@ -70,10 +70,8 @@ const Input = styled.input`
   background-color: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   
- 
-
-  &::placeholder { /* This targets the placeholder text */
-  color: rgba(246, 246, 246, 0.8); /* Set the placeholder text color to semi-transparent white */
+  &::placeholder { 
+  color: rgba(246, 246, 246, 0.8); 
     text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
   }
   
@@ -144,7 +142,6 @@ const DocumentContainer = styled.div`
   &::-webkit-scrollbar-thumb:hover {
     background: #555; 
   }
-
 
 `;
 
@@ -412,9 +409,9 @@ const UserIconContainer = styled.div`
     height: 35px; 
   }
 `;
+
 const RelevantQuestionsContainer = styled.div`
   display: flex;
-  /* justify-content: space-around; */
   flex-direction: column;
   margin-top: 10px;
   margin-left: 70px;
@@ -438,7 +435,6 @@ const RelevantQuestionBox = styled.div`
   margin-right: 10px;
   font-size: 12px;
   
-
   &:hover {
     background-color: #00B8D4;
     color: white;
@@ -485,7 +481,7 @@ const Sidebar = () => {
       
       toast.success('Predincting question, please wait!', {
         position: 'top-right',
-        autoClose: 5000,
+        autoClose: 6000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -501,7 +497,7 @@ const Sidebar = () => {
     setQuestions('Predicting...');
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.post('http://localhost:5000/InpainterGenerateQuestions', {
+      const response = await axios.post('https://wikidialog.me/InpainterGenerateQuestions', {
         title: title,
        
       }, {
@@ -523,10 +519,8 @@ const Sidebar = () => {
     }
     //console.log(formattedQuestion);
     setQuestions(formattedQuestion);
-   // setQuestions(prevQuestions => [...prevQuestions, formattedQuestion]);
     setAnswer(answer);
-    setIsFirstAnswer(true);  // Set this to true to trigger the display of relevant questions
-
+    setIsFirstAnswer(true);  
     } 
     catch (error) 
     {
@@ -565,10 +559,9 @@ const Sidebar = () => {
     setAIMessages([...AImessages, answer]);
     setConversation(prev => [...prev, { type: 'AI', text: `${answer}` }]); 
 
-    
     fetchQuestions(selectedTitle);
   };
- //console.log(conversation);
+
 
   const handleHelpMenuOpen = () => {
     setHelpMenuOpen(true);
@@ -602,7 +595,7 @@ const Sidebar = () => {
   });
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get('http://localhost:5000/getConversation', {
+      const response = await axios.get('https://wikidialog.me/getConversation', {
           headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -616,14 +609,10 @@ const Sidebar = () => {
       } else {
           // No conversation found or an empty list returned
           setConversation([{ type: 'AI', text: `Hi, I'm your automated assistant. I can answer your questions about ${title}.` }]);
-          //setAIMessages([`Hi, I'm your automated assistant. I can answer your questions about ${title}.`]);
-         // setConversation([]);
-
       }
   } catch (error) {
       console.error('Error fetching conversation:', error);
-     // setConversation([{ type: 'AI', text: `Failed to load conversation for "${title}". You may start a new conversation.` }]);
-     setConversation([]);
+      setConversation([]);
   }
   finally {
     setTimeout(() => {
@@ -647,7 +636,7 @@ const Sidebar = () => {
   const fetchTitles = async () => {
     const token = localStorage.getItem('access_token');
     try {
-        const response = await axios.get('http://localhost:5000/getTitles', {
+        const response = await axios.get('https://wikidialog.me/getTitles', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -693,13 +682,12 @@ const Sidebar = () => {
     setIsFetching(true);
     setSearchResults([]); 
 
-
     //console.log(searchQuery);
 
     try 
     {
         const token = localStorage.getItem('access_token');
-        const summaryResponse = await axios.get('http://localhost:5000/getSummary', {
+        const summaryResponse = await axios.get('https://wikidialog.me/getSummary', {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
@@ -747,7 +735,7 @@ const Sidebar = () => {
     }
   
     const token = localStorage.getItem('access_token');
-    axios.post('http://localhost:5000/deleteTitle', { title: titleToDelete }, {
+    axios.post('https://wikidialog.me/deleteTitle', { title: titleToDelete }, {
       headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -760,6 +748,8 @@ const Sidebar = () => {
             setSelectedSummary('');
             setConversation([]);
             setSelectedTitle('');
+            setQuestions("");
+            setShowRelevantQuestions(false); // Hide the renderRelevantQuestions component
             toast.success('Title deleted successfully!');
         } else {
             console.error('Failed to delete the title');
@@ -783,6 +773,8 @@ const Sidebar = () => {
     setMessages([]); 
     setConversation([]);
     setSelectedTitle("");
+    setQuestions("");
+    setShowRelevantQuestions(false); // Hide the renderRelevantQuestions component
 
   };
   
@@ -817,7 +809,7 @@ const Sidebar = () => {
 
     const token = localStorage.getItem('access_token');
     try {
-      const response = await axios.post('http://localhost:5000/getAnswer', {
+      const response = await axios.post('https://wikidialog.me/getAnswer', {
         title: selectedTitle,
         question: userInput
        
@@ -869,7 +861,7 @@ const Sidebar = () => {
     try
     {
        // console.log(conversation);
-        const response = await axios.post('http://localhost:5000/saveConversation', {
+        const response = await axios.post('https://wikidialog.me/saveConversation', {
             title: selectedTitle,
             conversation: conversation
         }, {
@@ -984,11 +976,6 @@ const Sidebar = () => {
                   </AiIconContainer>
                   <MessageBox position='left' title='WikiDialog' type='text' text={message.text} />
                 </AiMessageContainer>
-                {/* {showRelevantQuestions ? renderRelevantQuestions(questions) :       
-            <TextStyle style={{cursor: 'pointer'}} onClick={() => setShowRelevantQuestions(true)}>
-              <AutoFixHighIcon style={{ fontSize: '20px' }} />
-              Predicting...
-            </TextStyle>} */}
             {index === lastAIIndex && showRelevantQuestions && renderRelevantQuestions(questions)}
               </>
             ) : (
@@ -1014,7 +1001,6 @@ const Sidebar = () => {
               text={selectedTitle ? `Hi, I'm your automated assistant. I can answer your questions about ${selectedTitle}.` : `Hi! Start a new conversation by searching for a Wikipedia document title! See "Help Menu" for more details!`}
             />
           </AiMessageContainer>
-          {/* {!isFirstAnswer && selectedTitle && renderRelevantQuestions(questions)} */}
           {showRelevantQuestions ? renderRelevantQuestions(questions) : null}
         </AiContainer>
       )}

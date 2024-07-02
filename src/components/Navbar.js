@@ -17,7 +17,6 @@ const Container = styled.div`
   z-index: 1000;
   width: 100%;
 
-
 `;
 
 const Wrapper = styled.div`
@@ -62,7 +61,7 @@ const Right = styled.div`
   }
 
   @media screen and (min-width > 1600px) {
-    margin-left: 590px; //de modif aici
+    margin-left: 590px; 
   }
 `;
 
@@ -121,7 +120,7 @@ const Navbar = () => {
         });
 
     setTimeout(() => {
-      window.location.href = '/login'; // Or use window.location.reload() for a hard refresh
+      window.location.href = '/login'; //  refresh
     }, 1000); 
   }
 
@@ -129,7 +128,6 @@ const Navbar = () => {
         <Container>
           <Wrapper>
             <Right>
-            {/* <HelpOutlineOutlinedIcon style={{marginRight: "5px"}}/> */}
             <LogOutButton onClick={handleLogout}>
               <LogOutText> Log Out </LogOutText> 
                     <LogOutIcon icon={LogoutIcon}/>

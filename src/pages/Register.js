@@ -143,6 +143,11 @@ const Spinner = styled.div`
   }
 `;
 
+const TypeAnimationContainer = styled.div`
+  position: relative;
+  left: 2%; /* Adjust this value to move the text to the right */
+`;
+
 const Register = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -172,7 +177,7 @@ const Register = () => {
     setIsFetching(true);
     try 
     {
-      const response = await axios.post('http://localhost:5000/register', {
+      const response = await axios.post('https://wikidialog.me/register', {
         email: email,
         username: username,
         password: password
@@ -210,6 +215,7 @@ const Register = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}>
+        <TypeAnimationContainer>
           <TypeAnimation
         sequence={[
           'Welcome to WikiDialog!',
@@ -225,6 +231,7 @@ const Register = () => {
         textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'}}
         repeat={Infinity}
       />
+      </TypeAnimationContainer>
         <InnerContainer>
             <motion.h1
                 initial={{ opacity: 0, y: -50 }}
